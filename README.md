@@ -389,6 +389,11 @@ python -m venv myenv
 ./myenv/Scripts/Activate.ps1
 ```
 
+````
+for Mac this commmand:
+source myenv/bin/activate
+````
+
 ### 3. Install dependencies
 
 ```bash
