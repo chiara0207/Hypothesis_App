@@ -697,7 +697,7 @@ st.markdown("""
     <h1 style="margin:0;font-size:1.8rem;">📊 Statistical Hypothesis Testing Assistant</h1>
     <p style="margin:0.3rem 0 0;opacity:0.85;font-size:0.95rem;">
         Upload a research PDF and/or a dataset — ask questions in plain language.
-        The AI selects and runs the right statistical test automatically.
+        The LLM selects and runs the right statistical test automatically.
     </p>
 </div>
 """, unsafe_allow_html=True)

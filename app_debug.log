@@ -1,0 +1,86 @@
+2026-06-02 11:42:49,373 - app_backend.main - INFO - App created and routes registered
+2026-06-02 11:42:50,654 - app_backend.main - INFO - App created and routes registered
+2026-06-02 19:07:24,775 - app_backend.routers.upload - INFO - PDF upload: EJ1172284.pdf
+2026-06-02 19:07:24,800 - app_backend.services.parser - INFO - PDF reader created, pages: 11
+2026-06-02 19:07:25,074 - app_backend.services.parser - INFO - PDF parsed in 0.30s, 41689 chars
+2026-06-02 19:07:25,075 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 57 chunks
+2026-06-02 19:07:27,481 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:07:27,543 - app_backend.services.embedder - INFO - Embedded 57 texts in 2.47s (dim=1536)
+2026-06-02 19:07:27,550 - app_backend.utils.vector_store - INFO - VectorStore: 57 total vectors stored
+2026-06-02 19:07:27,550 - app_backend.routers.upload - INFO - PDF ingested: 57 chunks
+2026-06-02 19:08:02,137 - app_backend.routers.upload - INFO - PDF upload: reading for ethics.pdf
+2026-06-02 19:08:02,143 - app_backend.services.parser - INFO - PDF reader created, pages: 35
+2026-06-02 19:08:04,700 - app_backend.services.parser - INFO - PDF parsed in 2.56s, 127216 chars
+2026-06-02 19:08:04,702 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 226 chunks
+2026-06-02 19:08:05,117 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:08:05,560 - app_backend.services.embedder - INFO - Embedded 226 texts in 0.86s (dim=1536)
+2026-06-02 19:08:05,568 - app_backend.utils.vector_store - INFO - VectorStore: 283 total vectors stored
+2026-06-02 19:08:05,568 - app_backend.routers.upload - INFO - PDF ingested: 226 chunks
+2026-06-02 19:08:15,565 - app_backend.routers.qa - INFO - ASK: 'What are the biases in this paper?'
+2026-06-02 19:08:15,565 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What are the biases in this paper?'
+2026-06-02 19:08:15,841 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:08:15,846 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.28s (dim=1536)
+2026-06-02 19:08:21,642 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:08:21,650 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 6.08s
+2026-06-02 19:10:01,392 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:01,939 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:02,376 - app_backend.main - INFO - App created and routes registered
+2026-06-02 19:10:02,633 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:03,159 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:03,263 - app_backend.main - INFO - App created and routes registered
+2026-06-02 19:10:06,532 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:07,069 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:07,154 - app_backend.main - INFO - App created and routes registered
+2026-06-02 19:10:36,238 - app_backend.main - INFO - App created and routes registered
+2026-06-02 19:10:36,348 - watchfiles.main - INFO - 1 change detected
+2026-06-02 19:10:59,931 - app_backend.routers.qa - INFO - ASK: 'What are the main findings?'
+2026-06-02 19:10:59,932 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What are the main findings?'
+2026-06-02 19:11:01,601 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:11:01,606 - app_backend.services.embedder - INFO - Embedded 1 texts in 1.67s (dim=1536)
+2026-06-02 19:11:03,239 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:11:03,250 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 3.32s
+2026-06-02 19:21:25,193 - app_backend.routers.upload - INFO - PDF upload: EJ1172284.pdf
+2026-06-02 19:21:25,195 - app_backend.services.parser - INFO - PDF reader created, pages: 11
+2026-06-02 19:21:25,352 - app_backend.services.parser - INFO - PDF parsed in 0.16s, 41689 chars
+2026-06-02 19:21:25,352 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 57 chunks
+2026-06-02 19:21:26,384 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:21:26,428 - app_backend.services.embedder - INFO - Embedded 57 texts in 1.08s (dim=1536)
+2026-06-02 19:21:26,432 - app_backend.utils.vector_store - INFO - VectorStore: 57 total vectors stored
+2026-06-02 19:21:26,432 - app_backend.routers.upload - INFO - PDF ingested: 57 chunks
+2026-06-02 19:21:44,318 - app_backend.routers.qa - INFO - ASK: 'What is the main research question or objective?'
+2026-06-02 19:21:44,318 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What is the main research question or objective?'
+2026-06-02 19:21:44,535 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:21:44,537 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.22s (dim=1536)
+2026-06-02 19:21:46,224 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:21:46,227 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 1.91s
+2026-06-02 19:22:26,018 - app_backend.routers.qa - INFO - ASK: 'What is most relevant for a thesis?'
+2026-06-02 19:22:26,018 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What is most relevant for a thesis?'
+2026-06-02 19:22:26,352 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:22:26,355 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.34s (dim=1536)
+2026-06-02 19:22:32,202 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:22:32,204 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 6.19s
+2026-06-02 19:22:59,114 - app_backend.routers.upload - INFO - PDF upload: reading for ethics.pdf
+2026-06-02 19:22:59,120 - app_backend.services.parser - INFO - PDF reader created, pages: 35
+2026-06-02 19:23:01,694 - app_backend.services.parser - INFO - PDF parsed in 2.58s, 127216 chars
+2026-06-02 19:23:01,696 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 226 chunks
+2026-06-02 19:23:02,616 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:23:03,142 - app_backend.services.embedder - INFO - Embedded 226 texts in 1.45s (dim=1536)
+2026-06-02 19:23:03,150 - app_backend.utils.vector_store - INFO - VectorStore: 283 total vectors stored
+2026-06-02 19:23:03,151 - app_backend.routers.upload - INFO - PDF ingested: 226 chunks
+2026-06-02 19:23:17,386 - app_backend.routers.qa - INFO - ASK: 'what are the biases'
+2026-06-02 19:23:17,386 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'what are the biases'
+2026-06-02 19:23:17,589 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-02 19:23:17,591 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.20s (dim=1536)
+2026-06-02 19:23:22,584 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:23:22,586 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 5.20s
+2026-06-02 19:24:15,848 - app_backend.routers.upload - INFO - CSV upload: Housing.csv
+2026-06-02 19:24:15,863 - app_backend.utils.session_store - INFO - Session created: 2818f774-9f48-41fa-ba9d-faa8c3c63d85 (Housing.csv, 545 rows)
+2026-06-02 19:24:15,873 - app_backend.routers.stats - INFO - EXAMPLES: session=2818f774-9f48-41fa-ba9d-faa8c3c63d85, n=6
+2026-06-02 19:24:19,316 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:21,403 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:23,206 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:25,253 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:26,891 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:30,274 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:32,833 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-02 19:24:35,186 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
