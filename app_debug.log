@@ -247,3 +247,182 @@
 2026-06-22 19:05:24,218 - watchfiles.main - INFO - 2 changes detected
 2026-06-22 19:05:24,761 - watchfiles.main - INFO - 1 change detected
 2026-06-22 19:05:25,143 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:05:43,166 - watchfiles.main - INFO - 69 changes detected
+2026-06-22 19:05:44,597 - watchfiles.main - INFO - 4 changes detected
+2026-06-22 19:05:55,523 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:06:04,089 - watchfiles.main - INFO - 2 changes detected
+2026-06-22 19:06:04,660 - watchfiles.main - INFO - 4 changes detected
+2026-06-22 19:06:20,564 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:06:20,863 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:07:42,964 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:07:51,076 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:08:00,611 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:09:04,463 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:09:04,474 - app_backend.routers.search - INFO - Paper search: question='Is there a relationship between socioeconomic status and academic performance in children?\n\n' → query='socioeconomic status academic performance children'
+2026-06-22 19:09:11,644 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:09:11,646 - app_backend.routers.search - INFO - Paper search: question='Is there a relationship between socioeconomic status and academic performance in children?\n\n' → query='socioeconomic status academic performance children'
+2026-06-22 19:10:18,245 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:10:18,771 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:10:19,140 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:10:28,539 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:10:29,109 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:10:29,235 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:10:45,908 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:10:45,919 - app_backend.routers.search - INFO - Paper search: question='Is there a relationship between socioeconomic status and academic performance in children?\n\n' → query='socioeconomic status academic performance children'
+2026-06-22 19:10:48,679 - app_backend.routers.search - INFO - Semantic Scholar response: status=200
+2026-06-22 19:11:49,505 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:11:50,032 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:11:50,340 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:11:59,069 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:11:59,616 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:11:59,756 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:12:04,449 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:12:04,974 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:12:05,117 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:12:09,519 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:12:10,039 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:12:10,169 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:12:13,651 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:12:14,187 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:12:14,311 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:12:20,560 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:12:21,055 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:12:21,190 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:12:25,885 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:12:26,417 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:12:26,540 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:14:58,958 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:14:59,451 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:14:59,589 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:15:13,107 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:15:13,609 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:15:13,738 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:15:18,139 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:15:18,669 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:15:18,792 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:15:30,927 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:15:31,507 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:15:31,640 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:17:55,717 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:17:56,265 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:17:56,528 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:21:37,428 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:21:37,439 - app_backend.routers.search - INFO - Paper search: question='"Is there a relationship between socioeconomic status and academic performance in children?"' → query='socioeconomic status academic performance children'
+2026-06-22 19:21:37,711 - app_backend.routers.search - INFO - Semantic Scholar: status=429
+2026-06-22 19:21:37,711 - app_backend.routers.search - WARNING - Semantic Scholar rate limited
+2026-06-22 19:21:38,111 - app_backend.routers.search - INFO - arXiv: status=200
+2026-06-22 19:21:38,964 - app_backend.routers.search - INFO - PubMed search: status=200
+2026-06-22 19:21:39,667 - app_backend.routers.search - INFO - OpenAlex: status=200
+2026-06-22 19:21:45,107 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:27:36,459 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:27:36,962 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:27:37,253 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:27:39,581 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:27:40,161 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:27:40,277 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:27:43,754 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:27:44,292 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:27:44,418 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:27:49,043 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:27:49,546 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:27:49,662 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:28:10,216 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:28:10,748 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:28:10,874 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:29:53,849 - app_backend.routers.chat - INFO - Chat message: 'Will there be unicorns one day?'
+2026-06-22 19:29:56,433 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:51:16,452 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:51:16,976 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:51:17,367 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:51:20,334 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:51:20,884 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:51:21,010 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:51:23,808 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:51:24,317 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:51:24,453 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:51:29,599 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:51:30,084 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:51:30,215 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:52:20,900 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:52:21,418 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:52:21,555 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:52:39,860 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:57:22,039 - app_backend.routers.chat - INFO - Chat message: 'Will there be unicorns one day?'
+2026-06-22 19:57:25,214 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:57:34,691 - app_backend.routers.chat - INFO - Chat message: 'What do you think of unicorns?'
+2026-06-22 19:57:37,706 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:58:15,499 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 19:58:15,504 - app_backend.routers.search - INFO - Paper search: question='Does sleep deprivation impair working memory in university students?' → query='Sleep deprivation effects on working memory university students'
+2026-06-22 19:58:15,802 - app_backend.routers.search - INFO - Semantic Scholar: status=429
+2026-06-22 19:58:15,803 - app_backend.routers.search - WARNING - Semantic Scholar rate limited
+2026-06-22 19:58:16,457 - app_backend.routers.search - INFO - OpenAlex: status=200
+2026-06-22 19:58:16,513 - app_backend.routers.search - INFO - arXiv: status=200
+2026-06-22 19:58:17,177 - app_backend.routers.search - INFO - PubMed search: status=200
+2026-06-22 19:58:20,919 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:02:06,537 - app_backend.routers.rank - INFO - Ranking 3 papers for question: 'Does sleep deprivation impair working memory in university students?'
+2026-06-22 20:02:08,251 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-22 20:02:11,937 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:03:28,454 - app_backend.routers.rank - INFO - Ranking 4 papers for question: 'Does sleep deprivation impair working memory in university students?'
+2026-06-22 20:03:28,516 - app_backend.routers.rank - WARNING - Could not extract text from Test 2.pdf: PyCryptodome is required for AES algorithm
+2026-06-22 20:03:29,251 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-22 20:03:33,040 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:05:38,146 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 20:05:48,146 - watchfiles.main - INFO - 1440 changes detected
+2026-06-22 20:05:48,690 - watchfiles.main - INFO - 1 change detected
+2026-06-22 20:05:49,017 - app_backend.main - INFO - App created and routes registered
+2026-06-22 20:06:08,094 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 20:06:08,591 - watchfiles.main - INFO - 1 change detected
+2026-06-22 20:06:08,721 - app_backend.main - INFO - App created and routes registered
+2026-06-22 20:06:17,082 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 20:06:17,590 - watchfiles.main - INFO - 1 change detected
+2026-06-22 20:06:17,714 - app_backend.main - INFO - App created and routes registered
+2026-06-22 20:06:24,380 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 20:06:24,854 - watchfiles.main - INFO - 1 change detected
+2026-06-22 20:06:24,990 - app_backend.main - INFO - App created and routes registered
+2026-06-22 20:07:47,611 - app_backend.routers.upload - INFO - CSV upload: Housing.csv
+2026-06-22 20:07:47,625 - app_backend.utils.session_store - INFO - Session created: b50585a3-eab0-41fd-b84c-7de4ea863211 (Housing.csv, 545 rows)
+2026-06-22 20:07:47,634 - app_backend.routers.stats - INFO - EXAMPLES: session=b50585a3-eab0-41fd-b84c-7de4ea863211, n=6
+2026-06-22 20:07:50,892 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:07:52,735 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:07:54,370 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:07:56,112 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:07:57,442 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:07:59,079 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:08:00,308 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:08:18,810 - app_backend.routers.stats - INFO - STATS: session=b50585a3-eab0-41fd-b84c-7de4ea863211, question='Does smoking predict disease?'
+2026-06-22 20:08:18,821 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-22 20:08:20,483 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:08:20,485 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: You asked whether smoking predicts disease, which implies a relationship between two categorical variables. However, the
+2026-06-22 20:08:20,485 - app_backend.services.stats_service - INFO - LLM selected test: unsupported, variables: {}
+2026-06-22 20:08:32,279 - app_backend.routers.stats - INFO - STATS: session=b50585a3-eab0-41fd-b84c-7de4ea863211, question='Can we predict the price of a house based on its area?'
+2026-06-22 20:08:32,289 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-22 20:08:34,103 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:08:34,106 - app_backend.services.stats_service - INFO - LLM selected test: simple_linear_regression, variables: {'x': 'area', 'y': 'price', 'group': None}
+2026-06-22 20:08:34,106 - app_backend.services.stats_service - INFO - After normalization: simple_linear_regression, variables: {'x': 'area', 'y': 'price'}
+2026-06-22 20:08:34,107 - app_backend.services.stats_service - INFO - Running simple_linear_regression...
+2026-06-22 20:08:35,200 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-22 20:08:37,286 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:09:00,459 - app_backend.routers.stats - INFO - STATS: session=b50585a3-eab0-41fd-b84c-7de4ea863211, question='Can we predict the price of a house based on its area?'
+2026-06-22 20:09:00,466 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-22 20:09:02,368 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:09:02,370 - app_backend.services.stats_service - INFO - LLM selected test: simple_linear_regression, variables: {'x': 'area', 'y': 'price', 'group': None}
+2026-06-22 20:09:02,371 - app_backend.services.stats_service - INFO - After normalization: simple_linear_regression, variables: {'x': 'area', 'y': 'price'}
+2026-06-22 20:09:02,371 - app_backend.services.stats_service - INFO - Running simple_linear_regression...
+2026-06-22 20:09:02,376 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-22 20:09:04,310 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:09:22,840 - app_backend.routers.stats - INFO - STATS: session=b50585a3-eab0-41fd-b84c-7de4ea863211, question='Is there a significant difference in price between houses located on the main ro'
+2026-06-22 20:09:22,850 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-22 20:09:24,728 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:09:24,732 - app_backend.services.stats_service - INFO - LLM selected test: independent_ttest, variables: {'x': None, 'y': 'price', 'group': 'mainroad'}
+2026-06-22 20:09:24,734 - app_backend.services.stats_service - INFO - After normalization: independent_ttest, variables: {'x': 'mainroad', 'y': 'price', 'group': 'mainroad'}
+2026-06-22 20:09:24,734 - app_backend.services.stats_service - INFO - Running independent_ttest...
+2026-06-22 20:09:24,748 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-22 20:09:27,657 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:09:39,761 - app_backend.routers.stats - INFO - STATS: session=b50585a3-eab0-41fd-b84c-7de4ea863211, question='Is there an association between the presence of a guestroom and the furnishing s'
+2026-06-22 20:09:39,771 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-22 20:09:41,281 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:09:41,283 - app_backend.services.stats_service - INFO - LLM selected test: chi_square, variables: {'x': 'guestroom', 'y': 'furnishingstatus', 'group': None}
+2026-06-22 20:09:41,283 - app_backend.services.stats_service - INFO - After normalization: chi_square, variables: {'x': 'guestroom', 'y': 'furnishingstatus'}
+2026-06-22 20:09:41,284 - app_backend.services.stats_service - INFO - Running chi_square...
+2026-06-22 20:09:41,301 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-22 20:09:43,837 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"

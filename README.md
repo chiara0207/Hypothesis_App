@@ -416,6 +416,11 @@ streamlit run frontend/app.py
 
 Open **http://localhost:8501** in your browser.
 
+# In case of changes to Backend/Frontend and need to re-run:
+
+  # Stop it with Ctrl+C, then:
+  source myenv/bin/activate && streamlit run frontend/app.py
+
 ### Typical usage
 
 1. Upload a **CSV/XLSX** in the sidebar (required for statistical analysis).

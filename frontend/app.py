@@ -68,6 +68,101 @@ for key, default in {
         st.session_state[key] = default
 
 
+def _stats_to_bytes(stats_history: list, fmt: str) -> bytes:
+    rows = []
+    for h in stats_history:
+        r = h["result"]
+        row = {
+            "Question": h["question"],
+            "Test": r.get("test_display_name", ""),
+            "p-value": r.get("p_value"),
+            "Test Statistic": r.get("statistic"),
+            "Alpha": r.get("alpha", 0.05),
+            "Significant": r.get("significant"),
+            "Interpretation": r.get("interpretation", ""),
+            "Plain Explanation": r.get("plain_explanation", ""),
+            "Rationale": r.get("rationale", ""),
+        }
+        for role, col in (r.get("variables_used") or {}).items():
+            row[f"Variable ({role})"] = col
+        rows.append(row)
+    df = pd.DataFrame(rows)
+    buf = BytesIO()
+    if fmt == "csv":
+        buf.write(df.to_csv(index=False).encode("utf-8"))
+    else:
+        with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="Results")
+    buf.seek(0)
+    return buf.getvalue()
+
+
+def _rankings_to_word(question: str, papers: list) -> bytes:
+    from docx import Document
+    from docx.shared import Pt, RGBColor
+    buf = BytesIO()
+    doc = Document()
+    doc.add_heading("Paper Relevance Report", 0)
+    doc.add_paragraph(f"Research question: {question}")
+    doc.add_paragraph(f"Papers analysed: {len(papers)}")
+    doc.add_paragraph()
+    for i, p in enumerate(papers, 1):
+        doc.add_heading(f"{i}. {p['filename']}", level=2)
+        run = doc.add_paragraph().add_run(f"{p['label']}  ·  {int(p['score']*100)}% match")
+        run.bold = True
+        doc.add_paragraph(p["explanation"])
+        if p.get("key_quote") and p["key_quote"] != "—":
+            q_para = doc.add_paragraph()
+            q_para.add_run(f'"{p["key_quote"]}"').italic = True
+        doc.add_paragraph()
+    doc.save(buf)
+    buf.seek(0)
+    return buf.getvalue()
+
+
+def _rankings_to_pdf(question: str, papers: list) -> bytes:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    label_colors = {
+        "Highly Relevant": colors.HexColor("#0a7c42"),
+        "Relevant": colors.HexColor("#1a56a0"),
+        "Somewhat Relevant": colors.HexColor("#a05c00"),
+        "Less Relevant": colors.HexColor("#c0392b"),
+    }
+    story = []
+    story.append(Paragraph("Paper Relevance Report", styles["Title"]))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(f"<b>Research question:</b> {question}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Papers analysed:</b> {len(papers)}", styles["Normal"]))
+    story.append(Spacer(1, 14))
+    for i, p in enumerate(papers, 1):
+        story.append(Paragraph(f"{i}. {p['filename']}", styles["Heading2"]))
+        col = label_colors.get(p["label"], colors.grey)
+        hex_col = "#{:02x}{:02x}{:02x}".format(int(col.red*255), int(col.green*255), int(col.blue*255))
+        story.append(Paragraph(
+            f'<font color="{hex_col}"><b>{p["label"]}</b></font>  ·  {int(p["score"]*100)}% match',
+            styles["Normal"],
+        ))
+        story.append(Spacer(1, 4))
+        story.append(Paragraph(p["explanation"], styles["Normal"]))
+        if p.get("key_quote") and p["key_quote"] != "—":
+            story.append(Spacer(1, 4))
+            story.append(Paragraph(f'<i>"{p["key_quote"]}"</i>', styles["Normal"]))
+        story.append(Spacer(1, 8))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.lightgrey))
+        story.append(Spacer(1, 8))
+    doc.build(story)
+    buf.seek(0)
+    return buf.getvalue()
+
+
 PDF_QA_PROMPTS = [
     "What is the main research question or objective?",
     "What methodology or study design was used?",
@@ -799,11 +894,13 @@ with st.sidebar:
 # MAIN AREA — Tabs
 # ════════════════════════════════════════════════════════════════════
 
-tab_qa, tab_stats, tab_data, tab_search = st.tabs([
+tab_qa, tab_stats, tab_data, tab_search, tab_chat, tab_rank = st.tabs([
     "💬 Ask Questions",
     "🔬 Statistical Analysis",
     "🗃️ Data Preview",
     "🔍 Find Papers",
+    "🤖 Hypothesis Chat",
+    "📑 Rank Papers",
 ])
 
 
@@ -1044,7 +1141,23 @@ with tab_stats:
 
         if st.session_state.stats_history:
             st.markdown('<p class="stats-section-label">Session history</p>', unsafe_allow_html=True)
-            hist_header, hist_clear = st.columns([4, 1], vertical_alignment="center")
+            hist_header, hist_exp_csv, hist_exp_xlsx, hist_clear = st.columns([3, 1, 1, 1], vertical_alignment="center")
+            with hist_exp_csv:
+                st.download_button(
+                    "Export CSV",
+                    data=_stats_to_bytes(st.session_state.stats_history, "csv"),
+                    file_name="analysis_results.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                )
+            with hist_exp_xlsx:
+                st.download_button(
+                    "Export XLSX",
+                    data=_stats_to_bytes(st.session_state.stats_history, "xlsx"),
+                    file_name="analysis_results.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True,
+                )
             with hist_clear:
                 if st.button("Clear history", key="clear_stats", use_container_width=True):
                     st.session_state.stats_history = []
@@ -1104,6 +1217,8 @@ with tab_search:
         st.session_state.search_results = None
     if "search_query_used" not in st.session_state:
         st.session_state.search_query_used = ""
+    if "search_summary" not in st.session_state:
+        st.session_state.search_summary = ""
 
     with st.container(border=True):
         hypothesis = st.text_area(
@@ -1123,12 +1238,29 @@ with tab_search:
                 use_container_width=True,
             )
 
+        st.markdown('<p class="stats-section-label" style="margin-top:0.75rem;">Sources</p>', unsafe_allow_html=True)
+        src_cols = st.columns(4)
+        all_sources = ["Semantic Scholar", "arXiv", "PubMed", "OpenAlex"]
+        selected_sources = []
+        for i, src in enumerate(all_sources):
+            with src_cols[i]:
+                if st.checkbox(src, value=True, key=f"src_{src}"):
+                    selected_sources.append(src)
+
     if search_btn and hypothesis.strip():
-        with st.spinner("Extracting keywords and searching Semantic Scholar…"):
-            resp = backend("POST", "/search/papers", json={"question": hypothesis, "limit": result_limit})
-        if resp:
-            st.session_state.search_results = resp.get("results", [])
-            st.session_state.search_query_used = resp.get("query_used", "")
+        if not selected_sources:
+            st.warning("Please select at least one source.")
+        else:
+            with st.spinner("Searching across selected databases…"):
+                resp = backend("POST", "/search/papers", json={
+                    "question": hypothesis,
+                    "limit": result_limit,
+                    "sources": selected_sources,
+                })
+                if resp:
+                    st.session_state.search_results = resp.get("results", [])
+                    st.session_state.search_query_used = resp.get("query_used", "")
+                    st.session_state.search_summary = resp.get("summary", "")
 
     if st.session_state.search_results is not None:
         query_used = st.session_state.search_query_used
@@ -1139,6 +1271,17 @@ with tab_search:
             f'{len(results)} result{"s" if len(results) != 1 else ""} returned</p>',
             unsafe_allow_html=True,
         )
+
+        if st.session_state.search_summary:
+            st.markdown(
+                f"""
+                <div class="stats-rationale-box" style="margin:0.75rem 0 1rem;">
+                    <strong>Literature summary</strong><br><br>
+                    {html.escape(st.session_state.search_summary)}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
         if not results:
             st.info("No papers found. Try rephrasing your hypothesis.")
@@ -1167,11 +1310,26 @@ with tab_search:
                     link_parts.append(f'<a href="https://doi.org/{html.escape(doi)}" target="_blank">DOI</a>')
                 links_html = " · ".join(link_parts) if link_parts else ""
 
+                source = html.escape(paper.get("source") or "")
+                source_colors = {
+                    "Semantic Scholar": "#2d6a9f",
+                    "arXiv": "#b31b1b",
+                    "PubMed": "#2e7d32",
+                    "OpenAlex": "#6a1b9a",
+                }
+                source_color = source_colors.get(paper.get("source", ""), "#555")
+                source_badge = (
+                    f'<span style="background:{source_color};color:#fff;font-size:0.7rem;'
+                    f'font-weight:700;padding:0.2rem 0.55rem;border-radius:999px;margin-left:0.5rem;">'
+                    f'{source}</span>'
+                ) if source else ""
+
                 with st.expander(f"{i}. {paper.get('title', 'Untitled')} ({year})", expanded=(i == 1)):
                     st.markdown(
                         f"""
                         <div style="margin-bottom:0.5rem;">
-                            <span style="color:#5a6f85;font-size:0.85rem;">{author_str}</span>
+                            {source_badge}
+                            <span style="color:#5a6f85;font-size:0.85rem;margin-left:0.35rem;">{author_str}</span>
                             &nbsp;·&nbsp;
                             <span style="color:#5a6f85;font-size:0.85rem;">{year}</span>
                             &nbsp;·&nbsp;
@@ -1186,4 +1344,207 @@ with tab_search:
         if st.button("Clear results", key="clear_search"):
             st.session_state.search_results = None
             st.session_state.search_query_used = ""
+            st.session_state.search_summary = ""
             st.rerun()
+
+
+# ── Tab 5: Hypothesis Chatbot ────────────────────────────────────
+with tab_chat:
+    st.markdown("""
+    <div class="qa-hero">
+        <h3>Hypothesis Chat</h3>
+        <p>Throw any hypothesis at me — scientific, philosophical, or completely wild.
+        I'll engage with it seriously, creatively, and honestly.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if "hyp_chat_history" not in st.session_state:
+        st.session_state.hyp_chat_history = []
+
+    starter_hypotheses = [
+        "Will there be unicorns one day?",
+        "Could humans ever photosynthesize like plants?",
+        "Is consciousness just an illusion?",
+        "Will AI become smarter than all humans combined?",
+    ]
+
+    if not st.session_state.hyp_chat_history:
+        st.markdown('<p class="qa-prompt-label">Try one of these</p>', unsafe_allow_html=True)
+        s_cols = st.columns(2, gap="small")
+        for idx, s in enumerate(starter_hypotheses):
+            with s_cols[idx % 2]:
+                if st.button(s, key=f"starter_{idx}", use_container_width=True, type="secondary"):
+                    st.session_state.hyp_chat_history.append({"role": "user", "content": s})
+                    with st.spinner("Thinking…"):
+                        result = backend("POST", "/chat/message", json={
+                            "message": s,
+                            "history": [],
+                        })
+                    if result:
+                        st.session_state.hyp_chat_history.append({
+                            "role": "assistant",
+                            "content": result["reply"],
+                        })
+                    st.rerun()
+
+    for msg in st.session_state.hyp_chat_history:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    if st.session_state.hyp_chat_history:
+        if st.button("Clear chat", key="clear_hyp_chat"):
+            st.session_state.hyp_chat_history = []
+            st.rerun()
+
+    user_input = st.chat_input("Type any hypothesis, however wild…", key="hyp_chat_input")
+    if user_input:
+        st.session_state.hyp_chat_history.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking…"):
+                result = backend("POST", "/chat/message", json={
+                    "message": user_input,
+                    "history": st.session_state.hyp_chat_history[:-1],
+                })
+            if result:
+                reply = result["reply"]
+                st.markdown(reply)
+                st.session_state.hyp_chat_history.append({"role": "assistant", "content": reply})
+
+
+# ── Tab 6: Rank Papers ───────────────────────────────────────────
+with tab_rank:
+    st.markdown("""
+    <div class="qa-hero">
+        <h3>Paper Relevance Ranker</h3>
+        <p>Upload your collected PDFs and enter your research question.
+        The AI ranks every paper by how well it fits your thesis and explains why.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if "rank_results" not in st.session_state:
+        st.session_state.rank_results = None
+    if "rank_question" not in st.session_state:
+        st.session_state.rank_question = ""
+
+    with st.container(border=True):
+        rank_question = st.text_area(
+            "Your research question or thesis topic",
+            placeholder="e.g. How does social media use affect mental health in adolescents?",
+            height=90,
+            label_visibility="collapsed",
+        )
+        rank_files = st.file_uploader(
+            "Upload research PDFs (up to 20)",
+            type=["pdf"],
+            accept_multiple_files=True,
+            key="rank_uploader",
+        )
+        rank_btn = st.button(
+            "Rank Papers",
+            type="primary",
+            disabled=not (rank_question.strip() and rank_files),
+            use_container_width=False,
+        )
+
+    if rank_btn and rank_question.strip() and rank_files:
+        with st.spinner(f"Analysing {len(rank_files)} paper(s)… this may take a moment."):
+            files_payload = [
+                ("files", (f.name, f.getvalue(), "application/pdf"))
+                for f in rank_files
+            ]
+            try:
+                import requests as _req
+                raw = _req.post(
+                    f"{BACKEND_URL}/rank/papers",
+                    data={"question": rank_question},
+                    files=files_payload,
+                    timeout=120,
+                )
+                raw.raise_for_status()
+                result = raw.json()
+            except Exception as e:
+                st.error(f"Ranking failed: {e}")
+                result = None
+
+        if result:
+            st.session_state.rank_results = result["papers"]
+            st.session_state.rank_question = result["question"]
+
+    if st.session_state.rank_results:
+        papers = st.session_state.rank_results
+        q = html.escape(st.session_state.rank_question)
+
+        st.markdown(
+            f'<p class="qa-toolbar-meta">Ranked {len(papers)} paper(s) for: <strong>{q}</strong></p>',
+            unsafe_allow_html=True,
+        )
+
+        label_colors = {
+            "Highly Relevant":    ("#e6f4ec", "#0a7c42", "#b8e6cc"),
+            "Relevant":           ("#e8f0fb", "#1a56a0", "#b8d0f0"),
+            "Somewhat Relevant":  ("#fef6e8", "#a05c00", "#f0d9a8"),
+            "Less Relevant":      ("#fdecea", "#c0392b", "#f5c6c0"),
+        }
+
+        for rank, paper in enumerate(papers, 1):
+            label = paper["label"]
+            score_pct = min(100, max(0, int(paper["score"] * 100)))
+            bg, fg, border = label_colors.get(label, ("#f0f4f8", "#333", "#ccc"))
+            filename = html.escape(paper["filename"])
+            explanation = html.escape(paper["explanation"])
+            key_quote = html.escape(paper["key_quote"])
+
+            with st.expander(f"{rank}. {paper['filename']}", expanded=(rank <= 3)):
+                st.markdown(
+                    f"""
+                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.85rem;flex-wrap:wrap;">
+                        <span style="background:{bg};color:{fg};border:1px solid {border};
+                              font-size:0.78rem;font-weight:700;padding:0.25rem 0.75rem;
+                              border-radius:999px;">{html.escape(label)}</span>
+                        <div style="flex:1;min-width:120px;max-width:200px;height:8px;
+                                    background:#e2ebf3;border-radius:999px;overflow:hidden;">
+                            <div style="width:{score_pct}%;height:100%;
+                                        background:linear-gradient(90deg,#2d6a9f,#4a8fc7);
+                                        border-radius:999px;"></div>
+                        </div>
+                        <span style="font-size:0.82rem;color:#2d6a9f;font-weight:600;">
+                            {score_pct}% match
+                        </span>
+                    </div>
+                    <p style="font-size:0.9rem;line-height:1.6;color:#3d5166;margin-bottom:0.6rem;">
+                        {explanation}
+                    </p>
+                    <div style="background:#f8fafc;border-left:3px solid #2d6a9f;
+                                padding:0.6rem 0.9rem;border-radius:0 6px 6px 0;
+                                font-size:0.85rem;color:#1e3a5f;font-style:italic;">
+                        "{key_quote}"
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+        st.markdown('<p class="stats-section-label">Export results</p>', unsafe_allow_html=True)
+        exp_col1, exp_col2, exp_col3 = st.columns([1, 1, 2], vertical_alignment="center")
+        with exp_col1:
+            st.download_button(
+                "Download Word",
+                data=_rankings_to_word(st.session_state.rank_question, papers),
+                file_name="paper_rankings.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                use_container_width=True,
+            )
+        with exp_col2:
+            st.download_button(
+                "Download PDF",
+                data=_rankings_to_pdf(st.session_state.rank_question, papers),
+                file_name="paper_rankings.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )
+        with exp_col3:
+            if st.button("Clear rankings", key="clear_rank", use_container_width=True):
+                st.session_state.rank_results = None
+                st.session_state.rank_question = ""
+                st.rerun()
