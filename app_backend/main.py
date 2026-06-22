@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import upload as upload_router
 from .routers import qa as qa_router
 from .routers import stats as stats_router
+from .routers import search as search_router
 from .utils.vector_store import VectorStore
 from .services.qa_engine import QAEngine
 
@@ -57,6 +58,7 @@ def create_app() -> FastAPI:
     app.include_router(upload_router.router, prefix="/upload", tags=["Upload"])
     app.include_router(qa_router.router, prefix="/qa", tags=["Q&A"])
     app.include_router(stats_router.router, prefix="/stats", tags=["Statistics"])
+    app.include_router(search_router.router, prefix="/search", tags=["Search"])
 
     @app.get("/health")
     def health():

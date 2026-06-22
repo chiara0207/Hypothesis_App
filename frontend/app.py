@@ -799,10 +799,11 @@ with st.sidebar:
 # MAIN AREA — Tabs
 # ════════════════════════════════════════════════════════════════════
 
-tab_qa, tab_stats, tab_data = st.tabs([
+tab_qa, tab_stats, tab_data, tab_search = st.tabs([
     "💬 Ask Questions",
     "🔬 Statistical Analysis",
     "🗃️ Data Preview",
+    "🔍 Find Papers",
 ])
 
 
@@ -1087,3 +1088,102 @@ with tab_data:
              for col in st.session_state.csv_columns]
         )
         st.dataframe(dtype_df, use_container_width=True, hide_index=True)
+
+
+# ── Tab 4: Find Papers ───────────────────────────────────────────
+with tab_search:
+    st.markdown("""
+    <div class="qa-hero">
+        <h3>Find Papers &amp; Datasets</h3>
+        <p>Enter your hypothesis or research question — the AI extracts keywords and
+        searches Semantic Scholar for the most relevant academic papers.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if "search_results" not in st.session_state:
+        st.session_state.search_results = None
+    if "search_query_used" not in st.session_state:
+        st.session_state.search_query_used = ""
+
+    with st.container(border=True):
+        hypothesis = st.text_area(
+            "Your hypothesis or research question",
+            placeholder="e.g. Does sleep deprivation impair working memory in young adults?",
+            height=100,
+            label_visibility="collapsed",
+        )
+        s_col1, s_col2 = st.columns([2, 1], gap="medium", vertical_alignment="bottom")
+        with s_col1:
+            result_limit = st.selectbox("Results to return", [5, 10, 15, 20], index=1)
+        with s_col2:
+            search_btn = st.button(
+                "Search Papers",
+                type="primary",
+                disabled=not hypothesis.strip(),
+                use_container_width=True,
+            )
+
+    if search_btn and hypothesis.strip():
+        with st.spinner("Extracting keywords and searching Semantic Scholar…"):
+            resp = backend("POST", "/search/papers", json={"question": hypothesis, "limit": result_limit})
+        if resp:
+            st.session_state.search_results = resp.get("results", [])
+            st.session_state.search_query_used = resp.get("query_used", "")
+
+    if st.session_state.search_results is not None:
+        query_used = st.session_state.search_query_used
+        results = st.session_state.search_results
+
+        st.markdown(
+            f'<p class="qa-toolbar-meta">Search query: <strong>{html.escape(query_used)}</strong> · '
+            f'{len(results)} result{"s" if len(results) != 1 else ""} returned</p>',
+            unsafe_allow_html=True,
+        )
+
+        if not results:
+            st.info("No papers found. Try rephrasing your hypothesis.")
+        else:
+            for i, paper in enumerate(results, 1):
+                title = html.escape(paper.get("title") or "Untitled")
+                authors = paper.get("authors") or []
+                author_str = html.escape(", ".join(authors[:3]) + (" et al." if len(authors) > 3 else ""))
+                year = paper.get("year") or "—"
+                citations = paper.get("citation_count")
+                citation_str = f"{citations:,}" if citations is not None else "—"
+                abstract = (paper.get("abstract") or "").strip()
+                if len(abstract) > 400:
+                    abstract = abstract[:400].rstrip() + "…"
+                abstract_html = html.escape(abstract) if abstract else "<em>No abstract available.</em>"
+                doi = paper.get("doi")
+                pdf_url = paper.get("pdf_url")
+                paper_url = paper.get("paper_url")
+
+                link_parts = []
+                if paper_url:
+                    link_parts.append(f'<a href="{html.escape(paper_url)}" target="_blank">View on Semantic Scholar</a>')
+                if pdf_url:
+                    link_parts.append(f'<a href="{html.escape(pdf_url)}" target="_blank">Open PDF</a>')
+                if doi:
+                    link_parts.append(f'<a href="https://doi.org/{html.escape(doi)}" target="_blank">DOI</a>')
+                links_html = " · ".join(link_parts) if link_parts else ""
+
+                with st.expander(f"{i}. {paper.get('title', 'Untitled')} ({year})", expanded=(i == 1)):
+                    st.markdown(
+                        f"""
+                        <div style="margin-bottom:0.5rem;">
+                            <span style="color:#5a6f85;font-size:0.85rem;">{author_str}</span>
+                            &nbsp;·&nbsp;
+                            <span style="color:#5a6f85;font-size:0.85rem;">{year}</span>
+                            &nbsp;·&nbsp;
+                            <span style="color:#5a6f85;font-size:0.85rem;">🔖 {citation_str} citations</span>
+                        </div>
+                        <p style="font-size:0.9rem;line-height:1.6;color:#3d5166;margin-bottom:0.75rem;">{abstract_html}</p>
+                        <p style="font-size:0.82rem;">{links_html}</p>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+        if st.button("Clear results", key="clear_search"):
+            st.session_state.search_results = None
+            st.session_state.search_query_used = ""
+            st.rerun()

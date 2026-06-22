@@ -84,3 +84,166 @@
 2026-06-02 19:24:30,274 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2026-06-02 19:24:32,833 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2026-06-02 19:24:35,186 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 09:46:07,230 - watchfiles.main - INFO - 142 changes detected
+2026-06-03 09:46:08,583 - watchfiles.main - INFO - 4 changes detected
+2026-06-03 09:46:20,197 - watchfiles.main - INFO - 12 changes detected
+2026-06-03 15:33:50,426 - app_backend.main - INFO - App created and routes registered
+2026-06-03 15:33:51,020 - app_backend.main - INFO - App created and routes registered
+2026-06-03 15:34:34,094 - app_backend.routers.upload - INFO - PDF upload: EJ1172284.pdf
+2026-06-03 15:34:34,096 - app_backend.services.parser - INFO - PDF reader created, pages: 11
+2026-06-03 15:34:34,284 - app_backend.services.parser - INFO - PDF parsed in 0.19s, 41689 chars
+2026-06-03 15:34:34,285 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 57 chunks
+2026-06-03 15:34:37,067 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 15:34:37,092 - app_backend.services.embedder - INFO - Embedded 57 texts in 2.81s (dim=1536)
+2026-06-03 15:34:37,096 - app_backend.utils.vector_store - INFO - VectorStore: 57 total vectors stored
+2026-06-03 15:34:37,096 - app_backend.routers.upload - INFO - PDF ingested: 57 chunks
+2026-06-03 15:34:46,688 - app_backend.routers.upload - INFO - CSV upload: Housing.csv
+2026-06-03 15:34:46,695 - app_backend.utils.session_store - INFO - Session created: f507b264-9ae2-4b52-bcc3-07fb712928ca (Housing.csv, 545 rows)
+2026-06-03 15:34:46,709 - app_backend.routers.stats - INFO - EXAMPLES: session=f507b264-9ae2-4b52-bcc3-07fb712928ca, n=6
+2026-06-03 15:34:50,313 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:34:55,110 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:34:59,370 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:35:04,331 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:35:07,372 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:35:10,099 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:35:13,246 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:37:45,277 - app_backend.routers.qa - INFO - ASK: 'Summarize the key findings in a few sentences.'
+2026-06-03 15:37:45,278 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'Summarize the key findings in a few sentences.'
+2026-06-03 15:37:45,591 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 15:37:45,594 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.32s (dim=1536)
+2026-06-03 15:37:47,721 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:37:47,728 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 2.45s
+2026-06-03 15:38:40,185 - app_backend.routers.stats - INFO - STATS: session=f507b264-9ae2-4b52-bcc3-07fb712928ca, question='What is the correlation between area and price of the houses?'
+2026-06-03 15:38:40,193 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-03 15:38:42,325 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 15:38:42,352 - app_backend.services.stats_service - INFO - LLM selected test: pearson_correlation, variables: {'x': 'area', 'y': 'price', 'group': None}
+2026-06-03 15:38:42,353 - app_backend.services.stats_service - INFO - After normalization: pearson_correlation, variables: {'x': 'area', 'y': 'price'}
+2026-06-03 15:38:42,353 - app_backend.services.stats_service - INFO - Running pearson_correlation...
+2026-06-03 15:38:55,155 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-03 15:38:59,425 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:10,428 - app_backend.routers.upload - INFO - PDF upload: EJ1172284.pdf
+2026-06-03 16:17:10,432 - app_backend.services.parser - INFO - PDF reader created, pages: 11
+2026-06-03 16:17:10,668 - app_backend.services.parser - INFO - PDF parsed in 0.24s, 41689 chars
+2026-06-03 16:17:10,669 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 57 chunks
+2026-06-03 16:17:12,591 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 16:17:12,611 - app_backend.services.embedder - INFO - Embedded 57 texts in 1.94s (dim=1536)
+2026-06-03 16:17:12,614 - app_backend.utils.vector_store - INFO - VectorStore: 114 total vectors stored
+2026-06-03 16:17:12,614 - app_backend.routers.upload - INFO - PDF ingested: 57 chunks
+2026-06-03 16:17:19,764 - app_backend.routers.upload - INFO - CSV upload: Housing.csv
+2026-06-03 16:17:19,765 - app_backend.utils.session_store - INFO - Session created: 20554dc8-cca2-455b-af74-1e65d840166b (Housing.csv, 545 rows)
+2026-06-03 16:17:19,773 - app_backend.routers.stats - INFO - EXAMPLES: session=20554dc8-cca2-455b-af74-1e65d840166b, n=6
+2026-06-03 16:17:23,528 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:26,504 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:28,322 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:30,955 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:33,091 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:36,190 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:38,638 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:17:40,701 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:22:47,288 - app_backend.routers.qa - INFO - ASK: 'What is the main research question or objective?'
+2026-06-03 16:22:47,288 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What is the main research question or objective?'
+2026-06-03 16:22:48,498 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 16:22:48,499 - app_backend.services.embedder - INFO - Embedded 1 texts in 1.21s (dim=1536)
+2026-06-03 16:22:50,109 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:22:50,111 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 2.82s
+2026-06-03 16:23:30,801 - app_backend.routers.stats - INFO - STATS: session=20554dc8-cca2-455b-af74-1e65d840166b, question='What is the correlation between the area and the price of the houses?'
+2026-06-03 16:23:30,808 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-03 16:23:32,213 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:23:32,223 - app_backend.services.stats_service - INFO - LLM selected test: pearson_correlation, variables: {'x': 'area', 'y': 'price', 'group': None}
+2026-06-03 16:23:32,223 - app_backend.services.stats_service - INFO - After normalization: pearson_correlation, variables: {'x': 'area', 'y': 'price'}
+2026-06-03 16:23:32,223 - app_backend.services.stats_service - INFO - Running pearson_correlation...
+2026-06-03 16:23:32,228 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-03 16:23:34,726 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:04,882 - app_backend.routers.upload - INFO - PDF upload: EJ1172284.pdf
+2026-06-03 16:38:04,884 - app_backend.services.parser - INFO - PDF reader created, pages: 11
+2026-06-03 16:38:05,040 - app_backend.services.parser - INFO - PDF parsed in 0.16s, 41689 chars
+2026-06-03 16:38:05,040 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 57 chunks
+2026-06-03 16:38:06,065 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 16:38:06,140 - app_backend.services.embedder - INFO - Embedded 57 texts in 1.10s (dim=1536)
+2026-06-03 16:38:06,144 - app_backend.utils.vector_store - INFO - VectorStore: 171 total vectors stored
+2026-06-03 16:38:06,144 - app_backend.routers.upload - INFO - PDF ingested: 57 chunks
+2026-06-03 16:38:11,921 - app_backend.routers.upload - INFO - CSV upload: Housing.csv
+2026-06-03 16:38:11,924 - app_backend.utils.session_store - INFO - Session created: e3652226-fb23-499b-90fb-fb5f26aa12e8 (Housing.csv, 545 rows)
+2026-06-03 16:38:11,931 - app_backend.routers.stats - INFO - EXAMPLES: session=e3652226-fb23-499b-90fb-fb5f26aa12e8, n=6
+2026-06-03 16:38:14,836 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:17,446 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:21,732 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:25,095 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:27,276 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:29,423 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:38:31,441 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:44:19,209 - app_backend.routers.qa - INFO - ASK: 'What is the main research question or objective?'
+2026-06-03 16:44:19,210 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What is the main research question or objective?'
+2026-06-03 16:44:20,070 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 16:44:20,072 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.86s (dim=1536)
+2026-06-03 16:44:21,522 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:44:21,541 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 2.33s
+2026-06-03 16:45:04,669 - app_backend.routers.stats - INFO - STATS: session=e3652226-fb23-499b-90fb-fb5f26aa12e8, question='What is the correlation between the area of a house and its price?'
+2026-06-03 16:45:04,681 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-03 16:45:06,430 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 16:45:06,438 - app_backend.services.stats_service - INFO - LLM selected test: pearson_correlation, variables: {'x': 'area', 'y': 'price', 'group': None}
+2026-06-03 16:45:06,439 - app_backend.services.stats_service - INFO - After normalization: pearson_correlation, variables: {'x': 'area', 'y': 'price'}
+2026-06-03 16:45:06,439 - app_backend.services.stats_service - INFO - Running pearson_correlation...
+2026-06-03 16:45:06,446 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-03 16:45:08,546 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:08,017 - app_backend.routers.upload - INFO - PDF upload: EJ1172284.pdf
+2026-06-03 17:17:08,021 - app_backend.services.parser - INFO - PDF reader created, pages: 11
+2026-06-03 17:17:08,232 - app_backend.services.parser - INFO - PDF parsed in 0.21s, 41689 chars
+2026-06-03 17:17:08,233 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 57 chunks
+2026-06-03 17:17:10,057 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 17:17:10,080 - app_backend.services.embedder - INFO - Embedded 57 texts in 1.85s (dim=1536)
+2026-06-03 17:17:10,084 - app_backend.utils.vector_store - INFO - VectorStore: 228 total vectors stored
+2026-06-03 17:17:10,084 - app_backend.routers.upload - INFO - PDF ingested: 57 chunks
+2026-06-03 17:17:16,804 - app_backend.routers.upload - INFO - CSV upload: Housing.csv
+2026-06-03 17:17:16,807 - app_backend.utils.session_store - INFO - Session created: 3c3f5e19-c1e5-45cc-9320-75ca7a0d82b0 (Housing.csv, 545 rows)
+2026-06-03 17:17:16,816 - app_backend.routers.stats - INFO - EXAMPLES: session=3c3f5e19-c1e5-45cc-9320-75ca7a0d82b0, n=6
+2026-06-03 17:17:21,164 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:23,998 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:26,192 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:29,012 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:30,892 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:32,773 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:17:34,862 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:22:09,574 - app_backend.routers.qa - INFO - ASK: 'Summarize the key findings in a few sentences.'
+2026-06-03 17:22:09,575 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'Summarize the key findings in a few sentences.'
+2026-06-03 17:22:11,190 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-03 17:22:11,191 - app_backend.services.embedder - INFO - Embedded 1 texts in 1.62s (dim=1536)
+2026-06-03 17:22:12,818 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:22:12,833 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 3.26s
+2026-06-03 17:22:58,128 - app_backend.routers.stats - INFO - STATS: session=3c3f5e19-c1e5-45cc-9320-75ca7a0d82b0, question='What is the correlation between the area of the house and its price?'
+2026-06-03 17:22:58,132 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-06-03 17:23:00,219 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-03 17:23:00,227 - app_backend.services.stats_service - INFO - LLM selected test: pearson_correlation, variables: {'x': 'area', 'y': 'price', 'group': None}
+2026-06-03 17:23:00,227 - app_backend.services.stats_service - INFO - After normalization: pearson_correlation, variables: {'x': 'area', 'y': 'price'}
+2026-06-03 17:23:00,227 - app_backend.services.stats_service - INFO - Running pearson_correlation...
+2026-06-03 17:23:00,232 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-06-03 17:23:02,554 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 18:58:12,647 - app_backend.main - INFO - App created and routes registered
+2026-06-22 18:58:13,171 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:00:45,580 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:00:46,126 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:00:46,375 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:00:49,033 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:00:49,587 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:00:53,272 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:01:03,523 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:01:04,158 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:01:07,210 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:01:07,774 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:01:07,902 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:01:12,398 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:01:12,929 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:01:13,060 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:01:36,717 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:01:37,288 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:01:37,589 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:01:47,896 - watchfiles.main - INFO - 3 changes detected
+2026-06-22 19:04:13,420 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:04:18,442 - watchfiles.main - INFO - 2 changes detected
+2026-06-22 19:04:31,864 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:04:37,168 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:04:37,735 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:04:38,111 - app_backend.main - INFO - App created and routes registered
+2026-06-22 19:05:24,218 - watchfiles.main - INFO - 2 changes detected
+2026-06-22 19:05:24,761 - watchfiles.main - INFO - 1 change detected
+2026-06-22 19:05:25,143 - app_backend.main - INFO - App created and routes registered
