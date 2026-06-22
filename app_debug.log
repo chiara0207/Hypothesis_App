@@ -426,3 +426,6 @@
 2026-06-22 20:09:41,284 - app_backend.services.stats_service - INFO - Running chi_square...
 2026-06-22 20:09:41,301 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
 2026-06-22 20:09:43,837 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-22 20:17:27,770 - watchfiles.main - INFO - 84 changes detected
+2026-06-22 20:17:29,217 - watchfiles.main - INFO - 4 changes detected
+2026-06-22 20:19:01,312 - watchfiles.main - INFO - 3 changes detected

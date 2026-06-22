@@ -1,9 +1,19 @@
 # Statistical Hypothesis Testing Assistant
 
-Upload research **PDFs** and **CSV/XLSX datasets**, then ask questions in plain language. The app has two main capabilities:
+A research tool for students and academics. Upload **PDFs** and **CSV/XLSX datasets**, ask questions in plain language, search across multiple academic databases, rank your literature by relevance, and chat with an AI about any hypothesis.
 
-1. **Document Q&A** — Ask questions about an uploaded research PDF (RAG over embedded text chunks).
-2. **Statistical analysis** — Ask a question about your dataset; an LLM picks the right test, SciPy/statsmodels runs it, and the LLM explains the results in technical and plain language.
+---
+
+## Features
+
+| Tab | What it does |
+|-----|-------------|
+| **Ask Questions** | Chat with an uploaded research PDF using RAG (retrieval-augmented generation) |
+| **Statistical Analysis** | Describe a hypothesis in plain language — the AI picks the right test, SciPy runs it, the AI explains the results. Export to CSV or XLSX. |
+| **Data Preview** | Inspect columns, types, and sample rows from your uploaded dataset |
+| **Find Papers** | Enter a research question — searches Semantic Scholar, arXiv, PubMed, and OpenAlex in parallel and summarises the literature with an LLM |
+| **Hypothesis Chat** | Chat about any hypothesis, scientific or wild — the AI engages thoughtfully and asks follow-up questions |
+| **Rank Papers** | Upload up to 20 PDFs — the AI ranks them by relevance to your research question with explanations and key quotes. Export to Word or PDF. |
 
 The UI is a **Streamlit** app; all heavy logic lives in a **FastAPI** backend. They communicate over HTTP on `localhost`.
 
@@ -12,293 +22,295 @@ The UI is a **Streamlit** app; all heavy logic lives in a **FastAPI** backend. T
 ## Table of contents
 
 - [Architecture overview](#architecture-overview)
-- [How the project is built](#how-the-project-is-built)
-- [Startup: what happens when you run the app](#startup-what-happens-when-you-run-the-app)
+- [Project structure](#project-structure)
+- [Startup](#startup)
 - [Flow 1: PDF upload and Q&A](#flow-1-pdf-upload-and-qa)
 - [Flow 2: Dataset upload and statistical analysis](#flow-2-dataset-upload-and-statistical-analysis)
-- [Frontend (Streamlit) in detail](#frontend-streamlit-in-detail)
+- [Flow 3: Find Papers](#flow-3-find-papers)
+- [Flow 4: Hypothesis Chat](#flow-4-hypothesis-chat)
+- [Flow 5: Rank Papers](#flow-5-rank-papers)
+- [Export options](#export-options)
+- [Frontend session state](#frontend-session-state)
 - [Backend modules reference](#backend-modules-reference)
 - [API endpoints](#api-endpoints)
 - [Supported statistical tests](#supported-statistical-tests)
 - [Environment variables](#environment-variables)
 - [Quick start](#quick-start)
-- [Docker](#docker)
 
 ---
 
 ## Architecture overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  Browser  →  Streamlit (frontend/app.py)  :8501                          │
-│                    │                                                     │
-│                    │  HTTP (requests)                                    │
-│                    ▼                                                     │
-│  FastAPI (app_backend/main.py)  :8000                                   │
-│    ├── /upload/pdf   → parser → chunker → embedder → VectorStore (FAISS) │
-│    ├── /upload/csv   → pandas → session_store (in-memory DataFrame)      │
-│    ├── /qa/ask       → QAEngine (RAG + OpenAI chat)                      │
-│    └── /stats/analyze → stats_service (LLM select → SciPy → LLM explain) │
-│                                                                          │
-│  OpenAI API  (embeddings + chat completions)                             │
-└─────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Browser  →  Streamlit (frontend/app.py)  :8501                              │
+│                    │                                                         │
+│                    │  HTTP (requests)                                        │
+│                    ▼                                                         │
+│  FastAPI (app_backend/main.py)  :8000                                        │
+│    ├── /upload/pdf   → parser → chunker → embedder → VectorStore (FAISS)     │
+│    ├── /upload/csv   → pandas → session_store (in-memory DataFrame)          │
+│    ├── /qa/ask       → QAEngine (RAG + OpenAI chat)                          │
+│    ├── /stats/analyze → stats_service (LLM select → SciPy → LLM explain)    │
+│    ├── /search/papers → keyword extract → Semantic Scholar / arXiv /         │
+│    │                    PubMed / OpenAlex → LLM summary                      │
+│    ├── /chat/message  → OpenAI chat (hypothesis chatbot)                     │
+│    └── /rank/papers   → PyPDF2 extract → OpenAI embeddings → cosine rank     │
+│                         → LLM explanations                                   │
+│                                                                              │
+│  OpenAI API  (embeddings + chat completions)                                 │
+│  External APIs  (Semantic Scholar, arXiv, PubMed, OpenAlex — all free)      │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 | Layer | Technology | Role |
 |-------|------------|------|
-| Frontend | Streamlit | File uploads, tabs, chat UI, results display |
+| Frontend | Streamlit | File uploads, tabs, chat UI, results display, export |
 | API | FastAPI | REST endpoints, CORS, shared singletons |
 | PDF pipeline | PyPDF2, chunker, OpenAI embeddings | Index document for search |
 | Vector search | FAISS (or numpy fallback) | Similarity search over chunk embeddings |
 | Data | pandas | Load CSV/XLSX, profile schema, run tests |
 | Statistics | SciPy, statsmodels | Actual hypothesis tests |
-| Intelligence | OpenAI (`gpt-4o-mini`, `text-embedding-3-small`) | Test selection, Q&A answers, explanations |
-
-**Important design choices:**
-
-- **Two separate pipelines** — PDF content never mixes with CSV stats; they share only the UI and backend process.
-- **In-memory state** — PDF vectors live in a process-local `VectorStore`; datasets live in `session_store` keyed by `session_id`. Restarting the backend clears everything.
-- **LLM does not run the math** — The model chooses *which* test and *which columns*; numeric work is done by SciPy/statsmodels so results are reproducible.
+| Intelligence | OpenAI (`gpt-4o-mini`, `text-embedding-3-small`) | Test selection, Q&A, explanations, summaries, chat |
+| Academic search | Semantic Scholar, arXiv, PubMed, OpenAlex APIs | Free paper search — no API keys required |
+| Export | python-docx, reportlab, openpyxl | Word, PDF, XLSX file generation |
 
 ---
 
-## How the project is built
-
-The repo is a **Python monorepo** with a clear split:
+## Project structure
 
 ```
-stat-hypothesis-app/
+Hypothesis_App/
 ├── frontend/
-│   └── app.py                 # Streamlit UI (client only)
+│   └── app.py                  # Streamlit UI — all 6 tabs, export helpers
 ├── app_backend/
-│   ├── main.py                # FastAPI app factory, wires routers + singletons
-│   ├── config.py              # Loads .env, OpenAI and path settings
-│   ├── models/schema.py       # Pydantic request/response models
-│   ├── routers/               # Thin HTTP handlers
-│   │   ├── upload.py          # POST /upload/pdf, /upload/csv
-│   │   ├── qa.py              # POST /qa/ask
-│   │   └── stats.py           # POST /stats/analyze
-│   ├── services/              # Business logic
-│   │   ├── parser.py          # PDF → text
-│   │   ├── chunker.py         # Text → overlapping chunks
-│   │   ├── embedder.py        # Text → OpenAI vectors
-│   │   ├── qa_engine.py       # RAG question answering
-│   │   └── stats_service.py   # Full stats pipeline
+│   ├── main.py                 # FastAPI app factory, wires routers + singletons
+│   ├── config.py               # Loads .env, OpenAI and path settings
+│   ├── models/schema.py        # Pydantic request/response models
+│   ├── routers/
+│   │   ├── upload.py           # POST /upload/pdf, /upload/csv
+│   │   ├── qa.py               # POST /qa/ask
+│   │   ├── stats.py            # POST /stats/analyze, /stats/examples
+│   │   ├── search.py           # POST /search/papers (multi-source academic search)
+│   │   ├── chat.py             # POST /chat/message (hypothesis chatbot)
+│   │   └── rank.py             # POST /rank/papers (PDF relevance ranking)
+│   ├── services/
+│   │   ├── parser.py           # PDF → text
+│   │   ├── chunker.py          # Text → overlapping chunks
+│   │   ├── embedder.py         # Text → OpenAI vectors
+│   │   ├── qa_engine.py        # RAG question answering
+│   │   └── stats_service.py    # Profile → select test → run → explain
 │   └── utils/
-│       ├── vector_store.py    # FAISS / numpy vector DB
-│       └── session_store.py   # session_id → DataFrame
+│       ├── vector_store.py     # FAISS IndexFlatIP or numpy fallback
+│       └── session_store.py    # session_id → DataFrame
 ├── requirements.txt
-├── Dockerfile                 # Backend only (uvicorn)
 ├── .env.example
 └── README.md
 ```
 
-**Creation pattern:** `main.py` calls `create_app()`, which:
-
-1. Enables CORS (so Streamlit can call the API from the browser’s perspective via the Python `requests` client — CORS mainly helps if you add a web SPA later).
-2. Creates one shared `VectorStore` and one `QAEngine(store)`.
-3. Injects them into upload/qa routers via `set_vector_store()` / `set_engine()`.
-4. Mounts routers under `/upload`, `/qa`, `/stats`.
-
-Routers stay thin: validate input, call a service, return a Pydantic model.
-
 ---
 
-## Startup: what happens when you run the app
+## Startup
 
-### 1. Start the backend
+Both processes must run simultaneously.
+
+### 1. Create and activate virtual environment
+
+```bash
+# Create
+python -m venv myenv
+
+# Activate (macOS / Linux)
+source myenv/bin/activate
+
+# Activate (Windows PowerShell)
+./myenv/Scripts/Activate.ps1
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Set up environment variables
+
+Copy `.env.example` to `.env` and add your OpenAI API key:
+
+```
+OPENAI_API_KEY=sk-...
+```
+
+### 4. Start the backend (Terminal 1)
 
 ```bash
 uvicorn app_backend.main:app --reload --port 8000
 ```
 
-| Moment | What happens |
-|--------|----------------|
-| Process starts | `config.py` loads `.env` from the project root (`OPENAI_API_KEY`, models, limits). |
-| `create_app()` runs | Logging goes to console and `app_debug.log`. |
-| Singletons created | Empty `VectorStore` and `QAEngine` bound to it. |
-| Routes registered | `/upload/*`, `/qa/*`, `/stats/*`, `GET /health`. |
-| Server listens | API ready at `http://localhost:8000`. |
-
-### 2. Start the frontend
+### 5. Start the frontend (Terminal 2)
 
 ```bash
 streamlit run frontend/app.py
 ```
 
-| Moment | What happens |
-|--------|----------------|
-| Streamlit loads `app.py` | Page config (title, wide layout, sidebar). |
-| Session state initialized | Flags for PDF/CSV uploads, chat history, stats history, example questions. |
-| UI renders | Header, sidebar uploaders, three tabs. |
-| User actions | Each action calls `backend()` → HTTP to FastAPI on port 8000. |
+Open **http://localhost:8501** in your browser.
 
-Until both processes run, uploads and analysis will fail with a connection error in the UI.
+### Restarting after changes
+
+```bash
+# Stop with Ctrl+C, then:
+source myenv/bin/activate && streamlit run frontend/app.py
+```
 
 ---
 
 ## Flow 1: PDF upload and Q&A
 
-Use this when you want to **chat with a research PDF** (methods, findings, definitions).
-
-### Step-by-step: PDF upload
+Use this to **chat with a research paper** — ask about methods, findings, definitions, or limitations.
 
 ```
 User picks PDF in sidebar
-    → Streamlit POST /upload/pdf (multipart file)
-        → upload.py: read bytes
-        → parser.parse_pdf: PyPDF2 extracts text per page
-        → chunker.chunk_text: ~1000-token chunks, 200 overlap, UUID per chunk
-        → embedder.embed_texts: OpenAI embedding API for all chunks
-        → vector_store.add: normalize vectors, store in FAISS IndexFlatIP
-    → Response: { success, chunks_created, filename, message }
-    → Frontend sets pdf_uploaded = True
+    → POST /upload/pdf (multipart)
+        → parser.py: PyPDF2 extracts text per page
+        → chunker.py: ~1000-token chunks with 200-token overlap
+        → embedder.py: OpenAI text-embedding-3-small for all chunks
+        → vector_store.py: FAISS IndexFlatIP stores normalised vectors
+    → pdf_uploaded = True in session state
+
+User asks a question
+    → POST /qa/ask { question, top_k: 5 }
+        → embed question → cosine search → top_k chunks
+        → OpenAI chat with retrieved context
+    → Answer + source cards with relevance bars shown in chat
 ```
 
-| Step | File | Responsibility |
-|------|------|----------------|
-| Extract text | `parser.py` | `PdfReader` per page; fallback UTF-8 decode if PyPDF2 missing |
-| Chunk | `chunker.py` | Word-based windows with overlap for RAG context continuity |
-| Embed | `embedder.py` | Batch call to `text-embedding-3-small` (configurable) |
-| Store | `vector_store.py` | L2-normalized vectors; cosine similarity via inner product |
-
-### Step-by-step: Ask a question (RAG)
-
-```
-User types question in "Ask Questions" tab
-    → Streamlit POST /qa/ask { question, top_k: 5 }
-        → qa_engine.QAEngine.answer:
-            1. embed_texts([question])  → query vector
-            2. vector_store.query       → top_k chunks + scores
-            3. Build CONTEXT string from chunk texts (truncate at OPENAI_MAX_CONTEXT_CHARS)
-            4. OpenAI chat: system prompt + CONTEXT + QUESTION
-        → Response: { answer, sources[{ id, text, score }] }
-    → UI appends user + assistant messages to chat_history
-    → Sources shown in expandable panels
-```
-
-| Moment | Detail |
-|--------|--------|
-| Retrieval | Only indexed PDF chunks are searched; no CSV data involved. |
-| Generation | Temperature 0 for factual answers; cites source numbers when possible. |
-| If no PDF indexed | Chat input disabled; tab shows info message. |
-
-**Note:** Clicking “Remove PDF” in the sidebar only clears **frontend** session state. The backend `VectorStore` still holds vectors until the server restarts (there is no delete endpoint).
+**Note:** Clicking "Remove PDF" clears frontend state only. Backend vectors persist until server restart.
 
 ---
 
 ## Flow 2: Dataset upload and statistical analysis
 
-Use this when you want **automated hypothesis testing** on tabular data.
-
-### Step-by-step: CSV/XLSX upload
+Use this for **automated hypothesis testing** on tabular data.
 
 ```
 User picks CSV/XLSX in sidebar
-    → Streamlit POST /upload/csv
-        → upload.py: read bytes
-        → pandas read_csv or read_excel (by extension)
-        → session_store.create_session(df, filename) → UUID session_id
-        → Build preview (first 5 rows), dtypes, column list
-    → Response: { session_id, rows, columns, dtypes, preview, ... }
-    → Frontend stores session_id, columns, dtypes, preview
-    → generate_example_questions() runs (OpenAI or heuristic fallback)
-```
+    → POST /upload/csv
+        → pandas read_csv / read_excel
+        → session_store creates session_id → DataFrame
+    → Preview, column types, and example questions shown
 
-| Moment | Detail |
-|--------|--------|
-| Session | `session_id` is required for every `/stats/analyze` call. |
-| Memory | Full DataFrame kept in `_sessions` dict in the backend process. |
-| New file | If filename changes, frontend re-uploads and resets example questions. |
-
-### Step-by-step: Run statistical analysis
-
-```
-User enters question + clicks "Run Analysis"
-    → Streamlit POST /stats/analyze { session_id, question }
-        → stats.py: get_session(session_id) → DataFrame
-        → stats_service.run_statistical_analysis(df, question):
-
-            PHASE A — Understand the data
-            profile_dataframe(df)
-              → per column: dtype, nulls, unique count,
-                numeric min/max/mean OR categorical sample values
-
-            PHASE B — LLM selects test (temperature 0)
-            select_test_via_llm(question, schema_profile)
-              → JSON: { test, variables, rationale } OR { test: "unsupported", message, rationale }
-              → Must be one of SUPPORTED_TESTS identifiers, or `unsupported` if no test fits
-
-            PHASE C — Validate & run (no LLM)
-            Validate column names exist
-            TEST_RUNNERS[test_name](df, variables)
-              → SciPy / statsmodels
-              → p-value, statistic, additional_stats, assumption_checks
-
-            PHASE D — LLM explains results
-            explain_results_via_llm(...)
-              → JSON: { interpretation, plain_explanation }
-              → significant = p_value < alpha (default 0.05)
-
-        → StatTestResult returned to frontend
-    → UI shows test badge, significance, p-value, rationale,
-       variables, assumption checks, technical + plain explanations
-    → Result appended to stats_history
+User types a question → "Run Analysis"
+    → POST /stats/analyze { session_id, question }
+        → Phase A: profile_dataframe (dtypes, nulls, uniques, ranges)
+        → Phase B: LLM selects test + column mapping (temperature 0)
+        → Phase C: SciPy / statsmodels runs the test
+        → Phase D: LLM writes technical + plain-language explanation
+    → Results: test badge, p-value, significance, rationale,
+               variables used, assumption checks, interpretations
+    → Result added to session history → exportable as CSV or XLSX
 ```
 
 | Phase | Who decides | Output |
 |-------|-------------|--------|
-| A | Code (`profile_dataframe`) | Schema JSON for the LLM |
+| A | Code | Schema JSON |
 | B | LLM | Test name + column mapping + rationale |
-| C | Code (SciPy) | Numeric test results |
+| C | SciPy | p-value, statistic, assumption checks |
 | D | LLM | Human-readable interpretations |
-
-**Example:** Question *“Is cholesterol different between disease groups?”* with numeric `cholesterol` and categorical `disease` → LLM may pick `independent_ttest` or `mann_whitney_u` → runner checks normality (Shapiro / D’Agostino) and Levene → returns means, Cohen’s d, p-value → LLM writes both technical and plain summaries.
 
 ---
 
-## Frontend (Streamlit) in detail
+## Flow 3: Find Papers
 
-The frontend is **not** a React/Vue SPA. It is a single script, `frontend/app.py`, that Streamlit re-runs top-to-bottom on each interaction.
+Use this to **discover relevant academic papers** for a research question.
 
-### Configuration and HTTP helper
+```
+User types research question → selects sources → "Search Papers"
+    → POST /search/papers { question, limit, sources }
+        → LLM extracts focused search keywords (gpt-4o-mini)
+        → Selected sources queried in parallel (ThreadPoolExecutor):
+            • Semantic Scholar API (all fields, citation counts, open-access PDFs)
+            • arXiv API (physics, math, CS, biology — parsed from Atom XML)
+            • PubMed/NCBI eSearch + eSummary (medical & life sciences)
+            • OpenAlex API (250M+ works; abstract reconstructed from inverted index)
+        → Results deduplicated by DOI and normalised title
+        → Sorted: papers with abstracts and high citations first
+        → LLM generates a 3-5 sentence literature synthesis
+    → UI shows: source badge, authors, year, citations, abstract,
+                links (Semantic Scholar, PDF, DOI), LLM summary above list
+```
 
-- `BACKEND_URL = "http://localhost:8000"` — change this if the API runs elsewhere.
-- `backend(method, path, **kwargs)` wraps `requests` with 120s timeout, JSON parsing, and user-friendly errors if the API is down.
+All four sources are free — no API keys required.
 
-### Session state (the app’s “memory”)
+---
+
+## Flow 4: Hypothesis Chat
+
+Use this to **explore any hypothesis conversationally** — scientific or completely wild.
+
+```
+User types a hypothesis (or picks a starter prompt)
+    → POST /chat/message { message, history }
+        → OpenAI chat with system prompt tuned for hypothesis engagement:
+            • Serious hypotheses: evidence, plausibility, relevant science
+            • Wild hypotheses: creative but informed exploration
+            • Always ends with a follow-up question
+        → Last 10 messages sent as history for context
+    → Reply shown in chat; conversation continues
+```
+
+---
+
+## Flow 5: Rank Papers
+
+Use this to **rank your literature collection** by relevance to your thesis — saves time when deciding which papers to read first.
+
+```
+User uploads PDFs (up to 20) + types research question → "Rank Papers"
+    → POST /rank/papers (multipart: files + question form field)
+        → PyPDF2 extracts text from first 6 pages of each PDF (max 4000 chars)
+        → OpenAI embeddings for question + all papers in one batch call
+        → Cosine similarity computed per paper
+        → LLM generates per-paper explanation (2 sentences) + key quote
+        → Papers sorted highest → lowest similarity score
+    → UI shows: colour-coded label, % match bar, explanation, key quote
+                Top 3 expanded automatically
+    → Exportable as Word (.docx) or PDF
+```
+
+**Relevance labels:**
+
+| Label | Score range |
+|-------|------------|
+| Highly Relevant | ≥ 82% |
+| Relevant | 70–81% |
+| Somewhat Relevant | 55–69% |
+| Less Relevant | < 55% |
+
+---
+
+## Export options
+
+| Feature | Formats | What's included |
+|---------|---------|-----------------|
+| Statistical Analysis | CSV, XLSX | Question, test name, p-value, statistic, alpha, significance, variables, interpretation, plain explanation, rationale |
+| Paper Rankings | Word (.docx), PDF | Title, research question, ranked papers with label, match %, explanation, key quote |
+
+Export buttons appear automatically once results are available.
+
+---
+
+## Frontend session state
 
 | Key | Purpose |
 |-----|---------|
 | `pdf_uploaded`, `pdf_filename` | PDF tab enabled / label |
 | `csv_session_id`, `csv_filename`, `csv_columns`, `csv_dtypes`, `csv_preview`, `csv_rows` | Dataset identity and preview |
 | `chat_history` | Q&A messages `{role, content, sources?}` |
-| `stats_history` | Past analyses for the expander list |
-| `example_questions` | LLM-generated prompts for the stats tab |
-| `stat_question` | Bound to the analysis text area |
-
-Streamlit reruns the script when widgets change; state persists across reruns via `st.session_state`.
-
-### Layout
-
-1. **Custom CSS** — Header gradient, metric cards, significance colors, dark sidebar.
-2. **Sidebar** — PDF uploader (optional), CSV/XLSX uploader, column expander, remove buttons.
-3. **Three tabs**
-   - **Ask Questions** — Chat UI over PDF (`st.chat_message`, `st.chat_input`).
-   - **Statistical Analysis** — Example question buttons, text area, α selector, run button, rich results layout.
-   - **Data Preview** — First rows and dtype table from upload response (no extra API call).
-
-### Frontend-only logic
-
-`generate_example_questions(columns, dtypes)` calls OpenAI **directly from the Streamlit process** (uses `OPENAI_API_KEY` from the environment) to suggest six dataset-specific questions. If that fails, it builds heuristic questions from numeric vs categorical columns.
-
-This is separate from the stats pipeline on the backend but improves UX before the user runs an analysis.
-
-### What the frontend does *not* do
-
-- No local PDF parsing or statistics — everything goes through FastAPI.
-- No authentication — local dev tool assumption.
-- Removing a dataset/PDF in the UI does not call backend delete APIs (sessions/vectors remain until server restart).
+| `stats_history` | Past analyses for history expander and export |
+| `example_questions`, `stat_question` | Stats tab UI state |
+| `search_results`, `search_query_used`, `search_summary` | Find Papers results |
+| `hyp_chat_history` | Hypothesis Chat conversation |
+| `rank_results`, `rank_question` | Rank Papers results |
 
 ---
 
@@ -306,19 +318,21 @@ This is separate from the stats pipeline on the backend but improves UX before t
 
 | Module | Role |
 |--------|------|
-| `main.py` | App entry, CORS, singleton wiring |
-| `config.py` | `.env`, model names, token/context limits |
-| `routers/upload.py` | Multipart file handling for PDF and CSV |
+| `main.py` | App factory, CORS, singleton wiring, router mounting |
+| `config.py` | `.env` loading, model names, token/context limits |
+| `routers/upload.py` | Multipart PDF and CSV handling |
 | `routers/qa.py` | Delegates to `QAEngine` |
-| `routers/stats.py` | Loads session DataFrame, calls `run_statistical_analysis` |
-| `services/parser.py` | PDF text extraction |
+| `routers/stats.py` | Loads session DataFrame, calls stats pipeline |
+| `routers/search.py` | Keyword extraction, parallel multi-source search, deduplication, LLM summary |
+| `routers/chat.py` | Hypothesis chatbot with conversation history |
+| `routers/rank.py` | PDF text extraction, embedding, cosine ranking, LLM explanations |
+| `services/parser.py` | PDF → text (PyPDF2) |
 | `services/chunker.py` | Overlapping text chunks for RAG |
 | `services/embedder.py` | OpenAI embedding batches |
 | `services/qa_engine.py` | Retrieve chunks + generate answer |
-| `services/stats_service.py` | Profile → select test → run → explain |
-| `utils/vector_store.py` | FAISS `IndexFlatIP` or numpy dot-product fallback |
+| `services/stats_service.py` | Profile → LLM select → SciPy → LLM explain |
+| `utils/vector_store.py` | FAISS `IndexFlatIP` or numpy fallback |
 | `utils/session_store.py` | In-memory `session_id` → `{df, filename}` |
-| `models/schema.py` | Pydantic contracts for API I/O |
 
 ---
 
@@ -328,17 +342,19 @@ This is separate from the stats pipeline on the backend but improves UX before t
 |--------|----------|-------------|
 | `POST` | `/upload/pdf` | Upload PDF → chunk → embed → FAISS |
 | `POST` | `/upload/csv` | Upload CSV/XLSX → `session_id` + metadata |
-| `POST` | `/qa/ask` | RAG question over indexed PDFs |
-| `POST` | `/stats/analyze` | LLM + SciPy analysis on session dataset (422 on invalid setup) |
+| `POST` | `/qa/ask` | RAG question over indexed PDF |
+| `POST` | `/stats/analyze` | LLM + SciPy analysis on session dataset |
+| `POST` | `/stats/examples` | Generate example questions for a dataset |
+| `POST` | `/search/papers` | Multi-source academic paper search |
+| `POST` | `/chat/message` | Hypothesis chatbot turn |
+| `POST` | `/rank/papers` | Rank uploaded PDFs by relevance to a question |
 | `GET` | `/health` | `{ "status": "ok" }` |
 
-Interactive docs: `http://localhost:8000/docs` (Swagger UI).
+Interactive docs: **http://localhost:8000/docs**
 
 ---
 
 ## Supported statistical tests
-
-The LLM must return one of these identifiers; the backend runs the matching SciPy/statsmodels code:
 
 | Identifier | Display name |
 |------------|--------------|
@@ -356,7 +372,7 @@ The LLM must return one of these identifiers; the backend runs the matching SciP
 | `kruskal_wallis` | Kruskal-Wallis Test |
 | `wilcoxon_signed_rank` | Wilcoxon Signed-Rank Test |
 
-Many parametric tests include **assumption checks** (e.g. Shapiro-Wilk normality, Levene’s equal variance) returned in `assumption_checks`.
+Parametric tests include assumption checks (Shapiro-Wilk normality, Levene's equal variance) returned in the result.
 
 ---
 
@@ -364,128 +380,9 @@ Many parametric tests include **assumption checks** (e.g. Shapiro-Wilk normality
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OPENAI_API_KEY` | — | **Required** for embeddings, Q&A, stats selection, and explanations |
-| `OPENAI_CHAT_MODEL` | `gpt-4o-mini` | Chat completions |
-| `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embeddings for RAG |
+| `OPENAI_API_KEY` | — | **Required** — used for embeddings, Q&A, stats, search summaries, chat, and ranking |
+| `OPENAI_CHAT_MODEL` | `gpt-4o-mini` | Chat completions model |
+| `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embeddings for RAG and paper ranking |
 | `OPENAI_MAX_CONTEXT_CHARS` | `12000` | Max retrieved context length for Q&A |
 | `OPENAI_MAX_OUTPUT_TOKENS` | `1500` | Max tokens for generated answers/explanations |
-| `UPLOAD_DIR` | `/tmp/stat_app_uploads` | Created by config; uploads are mostly in-memory |
-
-Copy `.env.example` to `.env` and set your API key before starting.
-
----
-
-## Quick start
-
-### 1. Create virtual environment in the project root folder
-
-```bash
-python -m venv myenv
-```
-
-### 2. Activate environment by running this command
-
-```bash
-./myenv/Scripts/Activate.ps1
-```
-
-````
-for Mac this commmand:
-source myenv/bin/activate
-````
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Create .env file in the root folder and specify all the environment variables mentioned in .env.examples and add OPENAI API KEY
-
-### 3. Start the backend (terminal 1)
-
-```bash
-uvicorn app_backend.main:app --reload --port 8000
-```
-
-### 4. Start the frontend (terminal 2)
-
-```bash
-streamlit run frontend/app.py
-```
-
-Open **http://localhost:8501** in your browser.
-
-# In case of changes to Backend/Frontend and need to re-run:
-
-  # Stop it with Ctrl+C, then:
-  source myenv/bin/activate && streamlit run frontend/app.py
-
-### Typical usage
-
-1. Upload a **CSV/XLSX** in the sidebar (required for statistical analysis).
-2. Optionally upload a **PDF** for document Q&A.
-3. Use **Statistical Analysis** tab: pick an example question or type your own → **Run Analysis**.
-4. Use **Ask Questions** tab to query the PDF if you uploaded one.
-5. Use **Data Preview** to inspect columns and sample rows.
-
----
-
-## End-to-end diagram (both flows)
-
-```mermaid
-flowchart TB
-    subgraph UI["Streamlit Frontend"]
-        SB[Sidebar Uploads]
-        T1[Tab: Ask Questions]
-        T2[Tab: Statistical Analysis]
-        T3[Tab: Data Preview]
-    end
-
-    subgraph API["FastAPI Backend"]
-        UP[upload router]
-        QA[qa router]
-        ST[stats router]
-        VS[(VectorStore)]
-        SS[(Session Store)]
-    end
-
-    subgraph PDF["PDF Pipeline"]
-        P1[parse_pdf]
-        P2[chunk_text]
-        P3[embed_texts]
-    end
-
-    subgraph RAG["Q&A"]
-        R1[embed question]
-        R2[vector search]
-        R3[OpenAI chat]
-    end
-
-    subgraph STATS["Stats Pipeline"]
-        S1[profile_dataframe]
-        S2[LLM select test]
-        S3[SciPy / statsmodels]
-        S4[LLM explain]
-    end
-
-  SB -->|PDF| UP --> P1 --> P2 --> P3 --> VS
-  SB -->|CSV| UP --> SS
-  T1 -->|POST /qa/ask| QA --> RAG
-  RAG --> VS
-  RAG --> R3
-  T2 -->|POST /stats/analyze| ST --> STATS
-  STATS --> SS
-  T3 -->|uses cached preview| SB
-```
-
----
-
-## Summary
-
-| User goal | Upload | Endpoint | Core backend path |
-|-----------|--------|----------|-------------------|
-| Talk to a paper | PDF | `/upload/pdf` then `/qa/ask` | Parser → chunks → embeddings → FAISS → RAG |
-| Test a hypothesis on data | CSV/XLSX | `/upload/csv` then `/stats/analyze` | Session → profile → LLM pick test → SciPy → LLM explain |
-
-The Streamlit frontend orchestrates these flows, keeps UI state, and renders results; FastAPI owns data processing, vector search, and statistics. OpenAI is used for **language** tasks (selection, Q&A, explanation), not for computing p-values.
+| `UPLOAD_DIR` | `/tmp/stat_app_uploads` | Upload directory (created automatically) |
