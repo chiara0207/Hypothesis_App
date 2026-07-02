@@ -84,7 +84,7 @@ flowchart TD
 
 ```bash
 awk '/^```mermaid$/{f=1;next} /^```$/{if(f){f=0;next}} f' README.md > /tmp/arch.mmd
-npx @mermaid-js/mermaid-cli -i /tmp/arch.mmd -o docs/architecture.png
+npx @mermaid-js/mermaid-cli -i /tmp/arch.mmd -o docs/architecture.png -w 1600 -H 1200 -s 3 -b white
 ```
 
 *Or paste the block into [mermaid.live](https://mermaid.live) to export SVG/PNG by hand.)*
