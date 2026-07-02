@@ -67,3 +67,21 @@ class StatTestResult(BaseModel):
     significant: Optional[bool] = None
     alpha: float = 0.05
     error: Optional[str] = None
+
+# ── Visualization ─────────────────────────────────────────────────
+
+class VisualizationRequest(BaseModel):
+    session_id: str = Field(..., description="Session ID returned from CSV upload; used to fetch the analyzed dataset")
+    test_name: str = Field(..., example="independent_ttest")
+    variables_used: Dict[str, str] = Field(default_factory=dict, description="Column roles from the StatTestResult, e.g. {'group': 'method', 'y': 'score'}")
+    p_value: Optional[float] = Field(None, description="p-value from the statistical test")
+    alpha: float = Field(0.05, description="Significance threshold used for the test")
+
+class VisualizationChart(BaseModel):
+    key: str
+    title: str
+    figure: Dict[str, Any]
+    interpretation: str
+
+class VisualizationSuiteResponse(BaseModel):
+    charts: List[VisualizationChart] = []

@@ -9,6 +9,7 @@ from io import BytesIO
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+import plotly.graph_objects as go
 import requests
 import streamlit as st
 
@@ -251,7 +252,7 @@ def render_source_cards(sources: List[Dict[str, Any]], *, expanded: bool = False
             )
 
 
-def render_stats_result(result: Dict[str, Any]) -> None:
+def render_stats_result(result: Dict[str, Any], session_id: Optional[str] = None) -> None:
     """Render a statistical analysis result in a structured, professional layout."""
     test_name = html.escape(str(result.get("test_display_name", "Analysis")))
     rationale = html.escape(str(result.get("rationale", "")))
@@ -308,6 +309,29 @@ def render_stats_result(result: Dict[str, Any]) -> None:
             )
         kpi_html += "</div>"
         st.markdown(kpi_html, unsafe_allow_html=True)
+
+        sid = session_id or st.session_state.get("csv_session_id")
+        if sid:
+            suite = backend(
+                "POST",
+                "/visualization/suite",
+                json={
+                    "session_id": sid,
+                    "test_name": result.get("test_name", ""),
+                    "variables_used": result.get("variables_used") or {},
+                    "p_value": p_val,
+                    "alpha": alpha,
+                },
+            )
+            charts = (suite or {}).get("charts") or []
+            if charts:
+                st.markdown('<p class="stats-section-label">Visualizations</p>', unsafe_allow_html=True)
+                chart_tabs = st.tabs([c["title"] for c in charts])
+                for tab, chart in zip(chart_tabs, charts):
+                    with tab:
+                        st.plotly_chart(go.Figure(chart["figure"]), use_container_width=True)
+                        if chart.get("interpretation"):
+                            st.caption(chart["interpretation"])
 
         if rationale:
             st.markdown(
@@ -1076,7 +1100,7 @@ with tab_stats:
                         with ex_cols[col_idx]:
                             if st.button(
                                 ex,
-                                key=f"ex_{hash(ex)}",
+                                key=f"ex_{row_start + col_idx}",
                                 use_container_width=True,
                                 type="secondary",
                             ):
@@ -1137,6 +1161,7 @@ with tab_stats:
                     st.session_state.stats_history.append({
                         "question": stat_question,
                         "result": result,
+                        "session_id": st.session_state.csv_session_id,
                     })
 
         if st.session_state.stats_history:
@@ -1179,7 +1204,7 @@ with tab_stats:
                     elif r.get("plain_explanation"):
                         st.markdown(r["plain_explanation"])
                     else:
-                        render_stats_result(r)
+                        render_stats_result(r, session_id=h.get("session_id"))
 
 
 # ── Tab 3: Data Preview ──────────────────────────────────────────

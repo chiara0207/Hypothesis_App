@@ -93,13 +93,13 @@ SUPPORTED_TESTS = [
     "pearson_correlation",
     "simple_linear_regression",
     "chi_square",
+    "one_way_anova",
     # --- COMMENTED OUT (not available) ---
     # "paired_ttest",
     # "one_sample_ttest",
     # "spearman_correlation",
     # "multiple_linear_regression",
     # "logistic_regression",
-    # "one_way_anova",
     # "mann_whitney_u",
     # "kruskal_wallis",
     # "wilcoxon_signed_rank",
@@ -111,13 +111,13 @@ TEST_DISPLAY_NAMES = {
     "pearson_correlation": "Pearson Correlation",
     "simple_linear_regression": "Simple Linear Regression",
     "chi_square": "Chi-Square Test of Independence",
+    "one_way_anova": "One-Way ANOVA",
     # --- COMMENTED OUT ---
     # "paired_ttest": "Paired Samples T-Test",
     # "one_sample_ttest": "One-Sample T-Test",
     # "spearman_correlation": "Spearman Correlation",
     # "multiple_linear_regression": "Multiple Linear Regression",
     # "logistic_regression": "Logistic Regression",
-    # "one_way_anova": "One-Way ANOVA",
     # "mann_whitney_u": "Mann-Whitney U Test",
     # "kruskal_wallis": "Kruskal-Wallis Test",
     # "wilcoxon_signed_rank": "Wilcoxon Signed-Rank Test",
@@ -377,11 +377,22 @@ def normalize_test_selection(
             )
         return test_name, mapped
 
+    if test_name == "one_way_anova":
+        mapped = _normalize_group_and_value(variables, df)
+        group_col = mapped["group"]
+        unique_groups = df[group_col].dropna().unique()
+        if len(unique_groups) < 3:
+            raise StatisticalAnalysisError(
+                f"One-way ANOVA requires at least 3 distinct groups in '{group_col}'; "
+                f"found {len(unique_groups)}. For 2 groups use an independent t-test instead."
+            )
+        return test_name, mapped
+
     # --- COMMENTED OUT: normalization branches for inactive tests ---
     # if test_name == "one_sample_ttest": ...
     # if test_name in ("paired_ttest", "wilcoxon_signed_rank"): ...
     # if test_name == "spearman_correlation": ...
-    # if test_name in ("mann_whitney_u", "one_way_anova", "kruskal_wallis"): ...
+    # if test_name in ("mann_whitney_u", "kruskal_wallis"): ...
     # if test_name in ("multiple_linear_regression",): ...
     # if test_name == "logistic_regression": ...
 
@@ -422,16 +433,16 @@ def select_test_via_llm(question: str, schema_profile: Dict[str, Any]) -> Dict[s
     system_prompt = (
         "You are an expert statistician and gatekeeper for a statistical analysis application.\n"
         "Your ONLY job: decide whether the user's question can be answered by exactly one of the\n"
-        "4 SUPPORTED TESTS below, or whether it must be declared unsupported.\n\n"
+        "5 SUPPORTED TESTS below, or whether it must be declared unsupported.\n\n"
 
         # ── 1. SUPPORTED TESTS ────────────────────────────────────────────
         "══════════════════════════════════════════════════════════════\n"
-        "SUPPORTED TESTS — the ONLY 4 tests this application can run:\n"
+        "SUPPORTED TESTS — the ONLY 5 tests this application can run:\n"
         "══════════════════════════════════════════════════════════════\n"
         f"{available_tests_block}\n\n"
 
         "Each test has STRICT structural requirements listed below.\n"
-        "If the question cannot be mapped cleanly to one of these 4 tests, declare it unsupported.\n\n"
+        "If the question cannot be mapped cleanly to one of these 5 tests, declare it unsupported.\n\n"
 
         # ── 2. EXACT REQUIREMENTS PER TEST ───────────────────────────────
         "══════════════════════════════════\n"
@@ -452,10 +463,18 @@ def select_test_via_llm(question: str, schema_profile: Dict[str, Any]) -> Dict[s
         "   REQUIRES:\n"
         "   • Exactly ONE numeric predictor (independent variable, X)\n"
         "   • Exactly ONE numeric outcome (dependent variable, Y)\n"
-  
+
         "4. chi_square\n"
         "   REQUIRES:\n"
         "   • Exactly TWO categorical (non-numeric) columns\n"
+
+        "5. one_way_anova\n"
+        "   REQUIRES:\n"
+        "   • Exactly ONE numeric outcome column (e.g. score, weight, price)\n"
+        "   • Exactly ONE categorical grouping column with 3 OR MORE distinct categories\n"
+        "     (e.g. teaching method, region, treatment group)\n"
+        "   USE THIS when the question asks about differences across 3+ groups.\n"
+        "   Variables: set 'y' = numeric outcome, 'group' = categorical grouping column.\n\n"
 
         "══════════════════════════════════════════\n"
         "DECISION PROCESS — follow these steps:\n"
@@ -473,7 +492,7 @@ def select_test_via_llm(question: str, schema_profile: Dict[str, Any]) -> Dict[s
 
         "Option A — supported test:\n"
         "{\n"
-        '  "test": "<one of: independent_ttest | pearson_correlation | simple_linear_regression | chi_square>",\n'
+        '  "test": "<one of: independent_ttest | pearson_correlation | simple_linear_regression | chi_square | one_way_anova>",\n'
         '  "variables": {\n'
         '    "x": "<single predictor or grouping column name, or null>",\n'
         '    "y": "<single outcome column name>",\n'
@@ -486,8 +505,8 @@ def select_test_via_llm(question: str, schema_profile: Dict[str, Any]) -> Dict[s
         "{\n"
         f'  "test": "{UNSUPPORTED_TEST}",\n'
         '  "message": "<polite explanation: (1) what the user asked for, (2) which specific rule\n'
-        "    or disqualifier was triggered, (3) what the 4 available tests CAN do with this data.\n"
-        '    Be specific — e.g. mention multiple regression, ANOVA, etc. by name.>",\n'
+        "    or disqualifier was triggered, (3) what the 5 available tests CAN do with this data.\n"
+        '    Be specific — e.g. mention multiple regression, etc. by name.>",\n'
         '  "rationale": "<internal: which disqualifier fired and why>"\n'
         "}\n\n"
 
@@ -836,6 +855,107 @@ def _run_chi_square(df: pd.DataFrame, variables: Dict[str, str]) -> Dict[str, An
     }
 
 
+def _run_one_way_anova(df: pd.DataFrame, variables: Dict[str, str]) -> Dict[str, Any]:
+    """
+    One-Way ANOVA.
+    Requires: one numeric outcome (y) and one categorical grouping column (group).
+    Needs at least 3 groups, each with ≥ 2 observations.
+    Assumption checks: normality per group (Shapiro-Wilk), homogeneity of variance (Levene).
+    Additional stats: eta-squared effect size, per-group descriptives.
+    """
+    from scipy import stats
+
+    y_col = variables.get("y")
+    group_col = variables.get("group")
+    if not y_col or not group_col:
+        raise StatisticalAnalysisError(
+            "one_way_anova requires 'y' (numeric outcome) and 'group' (categorical) columns."
+        )
+    for col in (y_col, group_col):
+        if col not in df.columns:
+            raise StatisticalAnalysisError(
+                f"Column '{col}' not found. Available: {list(df.columns)}"
+            )
+
+    clean = df[[y_col, group_col]].copy()
+    clean[y_col] = pd.to_numeric(clean[y_col], errors="coerce")
+    clean = clean.dropna()
+
+    if len(clean) < 6:
+        raise StatisticalAnalysisError(
+            f"One-way ANOVA needs at least 6 complete rows; got {len(clean)}."
+        )
+
+    groups = {name: grp[y_col].values for name, grp in clean.groupby(group_col)}
+    if len(groups) < 3:
+        raise StatisticalAnalysisError(
+            f"One-way ANOVA requires at least 3 groups; found {len(groups)}: {list(groups.keys())}. "
+            "For 2 groups consider an independent t-test instead."
+        )
+    small = [name for name, vals in groups.items() if len(vals) < 2]
+    if small:
+        raise StatisticalAnalysisError(
+            f"Groups {small} have fewer than 2 observations. Each group needs at least 2."
+        )
+
+    f_stat, p_value = stats.f_oneway(*groups.values())
+
+    # Eta-squared effect size
+    all_values = clean[y_col].values
+    grand_mean = all_values.mean()
+    ss_between = sum(len(v) * (v.mean() - grand_mean) ** 2 for v in groups.values())
+    ss_total = sum((val - grand_mean) ** 2 for val in all_values)
+    eta_squared = round(float(ss_between / ss_total), 4) if ss_total > 0 else 0.0
+
+    # Per-group descriptives
+    group_stats = {
+        name: {
+            "n": int(len(vals)),
+            "mean": round(float(vals.mean()), 4),
+            "std": round(float(vals.std(ddof=1)), 4),
+        }
+        for name, vals in groups.items()
+    }
+
+    # Assumption checks
+    assumption_checks = []
+
+    # Normality per group (Shapiro-Wilk, only meaningful for n < 5000)
+    for name, vals in groups.items():
+        if len(vals) >= 3:
+            _, norm_p = stats.shapiro(vals)
+            passed = bool(norm_p > 0.05)
+            assumption_checks.append({
+                "name": f"Normality — {name}",
+                "passed": passed,
+                "detail": f"Shapiro-Wilk p = {norm_p:.4f} ({'normal' if passed else 'non-normal'})",
+            })
+
+    # Homogeneity of variance (Levene's test)
+    lev_stat, lev_p = stats.levene(*groups.values())
+    lev_passed = bool(lev_p > 0.05)
+    assumption_checks.append({
+        "name": "Homogeneity of variance (Levene's test)",
+        "passed": lev_passed,
+        "detail": (
+            f"Levene's W = {lev_stat:.4f}, p = {lev_p:.4f} "
+            f"({'equal variances' if lev_passed else 'unequal variances — consider Welch ANOVA'})"
+        ),
+    })
+
+    return {
+        "statistic": round(float(f_stat), 4),
+        "p_value": float(p_value),
+        "additional_stats": {
+            "eta_squared": eta_squared,
+            "n": int(len(clean)),
+            "n_groups": len(groups),
+            "group_stats": group_stats,
+        },
+        "assumption_checks": assumption_checks,
+    }
+
+
 # --- COMMENTED OUT: inactive test runners ---
 
 # def _run_paired_ttest(df, variables): ...
@@ -843,7 +963,6 @@ def _run_chi_square(df: pd.DataFrame, variables: Dict[str, str]) -> Dict[str, An
 # def _run_spearman_correlation(df, variables): ...
 # def _run_multiple_linear_regression(df, variables): ...
 # def _run_logistic_regression(df, variables): ...
-# def _run_one_way_anova(df, variables): ...
 # def _run_mann_whitney(df, variables): ...
 # def _run_kruskal_wallis(df, variables): ...
 # def _run_wilcoxon(df, variables): ...
@@ -858,13 +977,13 @@ TEST_RUNNERS = {
     "pearson_correlation": _run_pearson_correlation,
     "simple_linear_regression": _run_simple_linear_regression,
     "chi_square": _run_chi_square,
+    "one_way_anova": _run_one_way_anova,
     # --- COMMENTED OUT ---
     # "paired_ttest": _run_paired_ttest,
     # "one_sample_ttest": _run_one_sample_ttest,
     # "spearman_correlation": _run_spearman_correlation,
     # "multiple_linear_regression": _run_multiple_linear_regression,
     # "logistic_regression": _run_logistic_regression,
-    # "one_way_anova": _run_one_way_anova,
     # "mann_whitney_u": _run_mann_whitney,
     # "kruskal_wallis": _run_kruskal_wallis,
     # "wilcoxon_signed_rank": _run_wilcoxon,
@@ -1129,6 +1248,11 @@ def generate_valid_example_questions(df: pd.DataFrame, n: int = 6) -> List[str]:
     # For chi-square we need any two categoricals
     cat_col_names = [c["name"] for c in categorical_cols]
 
+    multi_cat_cols = [
+        c["name"] for c in categorical_cols
+        if c.get("unique_count", 0) >= 3
+    ]
+
     possible_tests: List[str] = []
     if len(numeric_cols) >= 2:
         possible_tests.extend(["pearson_correlation", "simple_linear_regression"])
@@ -1136,6 +1260,8 @@ def generate_valid_example_questions(df: pd.DataFrame, n: int = 6) -> List[str]:
         possible_tests.append("independent_ttest")
     if len(cat_col_names) >= 2:
         possible_tests.append("chi_square")
+    if numeric_cols and multi_cat_cols:
+        possible_tests.append("one_way_anova")
 
     if not possible_tests:
         return ["No supported statistical tests can be applied to this dataset."]
@@ -1160,9 +1286,10 @@ def generate_valid_example_questions(df: pd.DataFrame, n: int = 6) -> List[str]:
         "     - pearson_correlation: two numeric columns.\n"
         "     - simple_linear_regression: one numeric predictor → one numeric outcome.\n"
         "     - chi_square: two categorical (non-numeric) columns.\n"
-        "  4. NOT require ANOVA, multiple regression, logistic regression, paired tests, "
+        "     - one_way_anova: one numeric outcome + one categorical column with 3 OR MORE groups.\n"
+        "  4. NOT require multiple regression, logistic regression, paired tests, "
         "or any test NOT in the supported list above.\n\n"
-        "Cover all 4 supported tests where the data allows.\n"
+        "Cover all 5 supported tests where the data allows.\n"
         "Return ONLY a JSON array of 10 strings — no markdown, no explanation."
     )
 

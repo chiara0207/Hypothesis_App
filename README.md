@@ -162,6 +162,13 @@ Open **http://localhost:8501** in your browser.
 source myenv/bin/activate && streamlit run frontend/app.py
 ```
 
+# Tab 1 — Backend (FastAPI, Port 8000):
+  cd ~/stat-platform
+  ./start-backend.sh
+
+ # Tab 2 — Frontend (Next.js, Port 3000):
+  cd ~/stat-platform
+
 ---
 
 ## Flow 1: PDF upload and Q&A
