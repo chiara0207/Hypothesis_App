@@ -82,6 +82,24 @@ class VisualizationChart(BaseModel):
     title: str
     figure: Dict[str, Any]
     interpretation: str
+    handbook: Dict[str, str] = {}
 
 class VisualizationSuiteResponse(BaseModel):
     charts: List[VisualizationChart] = []
+
+class VisualizationChatMessage(BaseModel):
+    role: str
+    content: str
+
+class VisualizationChatRequest(BaseModel):
+    session_id: str = Field(..., description="Session ID returned from CSV upload")
+    test_name: str
+    variables_used: Dict[str, str] = {}
+    chart_key: str = Field(..., description="Which chart the question is about, e.g. 'boxplot'")
+    question: str
+    history: List[VisualizationChatMessage] = Field(default_factory=list, description="Prior turns of this chart's Q&A thread")
+    p_value: Optional[float] = None
+    alpha: float = 0.05
+
+class VisualizationChatResponse(BaseModel):
+    answer: str

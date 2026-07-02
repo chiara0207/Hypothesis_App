@@ -732,3 +732,104 @@
 2026-07-02 21:35:03,236 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
 2026-07-02 21:35:05,561 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2026-07-02 21:35:05,581 - app_backend.routers.visualization - INFO - VISUALIZATION: session=debbb21d-4462-4afb-a1f7-6299bd10a0b3, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:01:54,121 - app_backend.main - INFO - App created and routes registered
+2026-07-02 22:02:07,594 - app_backend.routers.upload - INFO - CSV upload: sample_visualization_test.csv
+2026-07-02 22:02:07,605 - app_backend.utils.session_store - INFO - Session created: bbec0b6f-0938-445f-ab13-7e3fabd1ac77 (sample_visualization_test.csv, 120 rows)
+2026-07-02 22:02:07,624 - app_backend.routers.visualization - INFO - VISUALIZATION: session=bbec0b6f-0938-445f-ab13-7e3fabd1ac77, test=independent_ttest, p_value=3e-05, alpha=0.05
+2026-07-02 22:02:20,025 - app_backend.routers.visualization - INFO - VIZ ASK: session=bbec0b6f-0938-445f-ab13-7e3fabd1ac77, chart=boxplot, question='Why is the Treatment box higher than the Control box?'
+2026-07-02 22:02:22,975 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:02:22,983 - app_backend.routers.visualization - INFO - VIZ ASK: session=bbec0b6f-0938-445f-ab13-7e3fabd1ac77, chart=boxplot, question='Is that difference big or small in practical terms?'
+2026-07-02 22:02:25,149 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:02:31,949 - app_backend.routers.visualization - INFO - VIZ ASK: session=bogus, chart=boxplot, question='test'
+2026-07-02 22:03:43,218 - app_backend.routers.upload - INFO - CSV upload: sample_anova_teaching.csv
+2026-07-02 22:03:43,221 - app_backend.utils.session_store - INFO - Session created: 9db09160-5737-41f7-b639-5659cc8c4824 (sample_anova_teaching.csv, 100 rows)
+2026-07-02 22:03:43,233 - app_backend.routers.stats - INFO - EXAMPLES: session=9db09160-5737-41f7-b639-5659cc8c4824, n=6
+2026-07-02 22:03:46,549 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:03:50,650 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:03:54,011 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:03:56,673 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:03:59,828 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:03:59,830 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about the association between a categorical variable (teaching_method) and a numeric variable (exam_s
+2026-07-02 22:04:02,409 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:04,865 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:07,323 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:09,882 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:09,884 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about the association between two variables: teaching_method (categorical) and study_hours_per_week (
+2026-07-02 22:04:11,993 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:14,013 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:28,167 - app_backend.routers.stats - INFO - STATS: session=9db09160-5737-41f7-b639-5659cc8c4824, question='How does study_hours_per_week affect exam_score in students?'
+2026-07-02 22:04:28,172 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-02 22:04:31,372 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:31,374 - app_backend.services.stats_service - INFO - LLM selected test: simple_linear_regression, variables: {'x': 'study_hours_per_week', 'y': 'exam_score', 'group': None}
+2026-07-02 22:04:31,375 - app_backend.services.stats_service - INFO - After normalization: simple_linear_regression, variables: {'x': 'study_hours_per_week', 'y': 'exam_score'}
+2026-07-02 22:04:31,375 - app_backend.services.stats_service - INFO - Running simple_linear_regression...
+2026-07-02 22:04:31,382 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-02 22:04:34,500 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:04:34,521 - app_backend.routers.visualization - INFO - VISUALIZATION: session=9db09160-5737-41f7-b639-5659cc8c4824, test=simple_linear_regression, p_value=0.9548863850444517, alpha=0.05
+2026-07-02 22:06:03,498 - app_backend.routers.stats - INFO - STATS: session=9db09160-5737-41f7-b639-5659cc8c4824, question='Is there a significant difference in score between the Control and Treatment gro'
+2026-07-02 22:06:03,504 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-02 22:06:08,568 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:06:08,569 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about a significant difference in scores between Control and Treatment groups. However, the dataset d
+2026-07-02 22:06:08,570 - app_backend.services.stats_service - INFO - LLM selected test: unsupported, variables: {}
+2026-07-02 22:07:10,424 - app_backend.routers.stats - INFO - STATS: session=9db09160-5737-41f7-b639-5659cc8c4824, question='Is there a significant difference in exam score between the different teaching m'
+2026-07-02 22:07:10,428 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-02 22:07:12,530 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:07:12,532 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:07:12,533 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:07:12,533 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-02 22:07:12,541 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-02 22:07:15,314 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:07:15,327 - app_backend.routers.visualization - INFO - VISUALIZATION: session=9db09160-5737-41f7-b639-5659cc8c4824, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:07:46,196 - app_backend.routers.stats - INFO - STATS: session=9db09160-5737-41f7-b639-5659cc8c4824, question='Is there a significant difference in exam score between the different teaching m'
+2026-07-02 22:07:46,203 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-02 22:07:48,206 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:07:48,208 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:07:48,210 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:07:48,210 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-02 22:07:48,217 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-02 22:07:50,919 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:07:51,006 - app_backend.routers.visualization - INFO - VISUALIZATION: session=9db09160-5737-41f7-b639-5659cc8c4824, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:08:09,598 - app_backend.routers.stats - INFO - STATS: session=9db09160-5737-41f7-b639-5659cc8c4824, question='Is there a significant difference in exam score between the different teaching m'
+2026-07-02 22:08:09,602 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-02 22:08:11,662 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:08:11,674 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:08:11,675 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:08:11,675 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-02 22:08:11,681 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-02 22:08:14,178 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:08:14,195 - app_backend.routers.visualization - INFO - VISUALIZATION: session=9db09160-5737-41f7-b639-5659cc8c4824, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:11:37,054 - app_backend.routers.upload - INFO - CSV upload: sample_anova_teaching.csv
+2026-07-02 22:11:37,061 - app_backend.utils.session_store - INFO - Session created: 5a08c90e-b0b7-4085-a9ae-35ae868d05ed (sample_anova_teaching.csv, 100 rows)
+2026-07-02 22:11:37,072 - app_backend.routers.stats - INFO - EXAMPLES: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, n=6
+2026-07-02 22:11:40,353 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:43,033 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:45,192 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:47,667 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:50,026 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:51,535 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:53,459 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:55,462 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:11:59,493 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:12:12,573 - app_backend.routers.stats - INFO - STATS: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, question='Is there a significant difference in exam score between the different teaching m'
+2026-07-02 22:12:12,578 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-02 22:12:14,549 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:12:14,550 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:12:14,551 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-02 22:12:14,551 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-02 22:12:14,568 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-02 22:12:17,119 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:12:17,130 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:12:33,452 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:12:34,800 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:12:34,882 - app_backend.routers.visualization - INFO - VIZ ASK: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, chart=violin, question='When would a distribution be skewed?'
+2026-07-02 22:12:37,163 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:12:37,243 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:14:42,858 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:14:42,938 - app_backend.routers.visualization - INFO - VIZ ASK: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, chart=violin, question='When would a distribution be skewed?'
+2026-07-02 22:14:44,960 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:14:45,033 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:15:08,071 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:15:09,441 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-02 22:15:09,520 - app_backend.routers.visualization - INFO - VIZ ASK: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, chart=violin, question='Is the distribution here skewed or how would you describe the distribution of On'
+2026-07-02 22:15:12,051 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-02 22:15:12,262 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05

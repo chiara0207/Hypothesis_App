@@ -37,8 +37,65 @@ def _fmt(x: Optional[float], nd: int = 3) -> str:
     return f"{x:.{nd}f}" if isinstance(x, (int, float)) and not isinstance(x, bool) else "—"
 
 
+# General, data-independent explanations of each chart type — the "handbook".
+CHART_HANDBOOK: Dict[str, Dict[str, str]] = {
+    "gauge": {
+        "what": "A speedometer-style gauge plotting your test's p-value against the significance threshold (alpha, usually 0.05).",
+        "how_to_read": "The bar shows where the p-value lands. Green background = p-value below alpha (statistically significant). Red background = p-value above alpha (not significant). The red vertical line marks alpha itself.",
+        "when_used": "Works for any hypothesis test — it's a quick, test-agnostic significance check.",
+    },
+    "boxplot": {
+        "what": "A boxplot (box-and-whisker plot) summarizes a numeric variable's distribution using five numbers: minimum, 25th percentile, median, 75th percentile, and maximum.",
+        "how_to_read": "The box spans the middle 50% of the data. The line inside is the median; the diamond marker is the mean. Whiskers extend to the typical range, and points beyond them are outliers.",
+        "when_used": "Ideal for comparing the spread and center of a numeric variable across two or more groups, like in a t-test or ANOVA.",
+    },
+    "violin": {
+        "what": "A violin plot is a boxplot combined with a mirrored density curve, showing the full shape of a distribution, not just summary statistics.",
+        "how_to_read": "The width at any height shows how common values near that height are — wider means more data points cluster there. The embedded box shows the median and quartiles, same as a boxplot.",
+        "when_used": "Use it when you want to see whether a distribution is skewed, bimodal, or has an unusual shape that a plain boxplot would hide.",
+    },
+    "bell_curve": {
+        "what": "An idealized normal ('bell-shaped') distribution curve fitted to each group, using that group's own mean and standard deviation.",
+        "how_to_read": "The peak of each curve sits at the group's mean (dashed vertical line); the width reflects the group's spread. Curves that barely overlap suggest the groups are genuinely different; heavy overlap suggests the difference could be random variation.",
+        "when_used": "A visual companion to t-tests and ANOVA — it shows why a significant p-value corresponds to well-separated distributions.",
+    },
+    "histogram": {
+        "what": "A histogram bins a numeric variable into ranges and counts how many observations fall into each range.",
+        "how_to_read": "Taller bars mean more observations in that range. The overall shape tells you whether the data is symmetric, skewed, or has multiple peaks.",
+        "when_used": "Useful for checking the 'normality' assumption behind many statistical tests, and for spotting outliers or unusual clusters.",
+    },
+    "scatter": {
+        "what": "A scatterplot plots each observation as a point using two numeric variables, one on each axis.",
+        "how_to_read": "A clear upward or downward pattern suggests a relationship. The dashed trend line is the best-fit straight line through the points; the tighter the points hug it, the stronger the linear relationship.",
+        "when_used": "The standard way to visualize correlation and simple linear regression results.",
+    },
+    "correlation_matrix": {
+        "what": "A grid (heatmap) showing the pairwise Pearson correlation between every pair of numeric columns in the dataset.",
+        "how_to_read": "Each cell ranges from -1 to +1. Values near +1 (dark red) mean the two variables move together; near -1 (dark blue) means they move in opposite directions; near 0 (near white) means little to no linear relationship.",
+        "when_used": "Useful for spotting which variables are related to each other across your whole dataset, beyond just the two variables in your specific test.",
+    },
+    "contingency": {
+        "what": "A contingency table heatmap showing how often each combination of two categorical variables occurs together.",
+        "how_to_read": "Each cell is the count of rows with that specific combination of categories. Uneven counts across a row or column, compared to what you'd expect if the variables were unrelated, are what drive a significant chi-square result.",
+        "when_used": "The standard visual for a chi-square test of independence between two categorical variables.",
+    },
+}
+
+
+def _handbook_key(chart_key: str) -> str:
+    if chart_key in ("histogram_x", "histogram_y"):
+        return "histogram"
+    return chart_key
+
+
 def _chart_entry(key: str, title: str, fig: go.Figure, interpretation: str) -> Dict[str, Any]:
-    return {"key": key, "title": title, "figure": _fig_to_dict(fig), "interpretation": interpretation}
+    return {
+        "key": key,
+        "title": title,
+        "figure": _fig_to_dict(fig),
+        "interpretation": interpretation,
+        "handbook": CHART_HANDBOOK.get(_handbook_key(key), {}),
+    }
 
 
 def _base_layout(fig: go.Figure, height: int = 380) -> None:
@@ -341,6 +398,62 @@ def _interp_contingency(df: pd.DataFrame, x_col: str, y_col: str) -> str:
         "spread out proportionally across rows and columns, the two variables would be independent — uneven "
         "cells like this are what drives a significant chi-square result."
     )
+
+
+# ── Chart Q&A context (grounds the LLM in real numbers, not guesses) ──
+
+def describe_chart_context(
+    df: pd.DataFrame,
+    test_name: str,
+    variables_used: Dict[str, str],
+    chart_key: str,
+    p_value: Optional[float],
+    alpha: float,
+) -> str:
+    """
+    Build a compact text block describing a specific chart — general handbook
+    explanation plus the concrete numbers behind it — for use as LLM context
+    when a user asks a follow-up question about that chart.
+    """
+    handbook = CHART_HANDBOOK.get(_handbook_key(chart_key), {})
+    group_col = variables_used.get("group") or variables_used.get("x")
+    value_col = variables_used.get("y")
+    x_col = variables_used.get("x")
+    y_col = variables_used.get("y")
+
+    parts = [
+        f"Chart type: {chart_key}",
+        f"What it is: {handbook.get('what', '')}",
+        f"How to read it: {handbook.get('how_to_read', '')}",
+        f"Overall test: {test_name}, p-value={_fmt(p_value, 5)}, alpha={alpha}.",
+    ]
+
+    try:
+        if chart_key == "gauge":
+            parts.append(_interp_gauge(p_value, alpha))
+        elif chart_key in ("boxplot", "violin") and group_col in df.columns and value_col in df.columns:
+            parts.append(_interp_group_spread(df, group_col, value_col, "box" if chart_key == "boxplot" else "violin"))
+            for g, vals in _group_series(df, group_col, value_col).items():
+                parts.append(
+                    f"Group '{g}': n={len(vals)}, mean={_fmt(vals.mean())}, std={_fmt(vals.std(ddof=1))}, "
+                    f"min={_fmt(vals.min())}, max={_fmt(vals.max())}"
+                )
+        elif chart_key == "bell_curve" and group_col in df.columns and value_col in df.columns:
+            parts.append(_interp_bell_curves(df, group_col, value_col, p_value, alpha))
+        elif chart_key in ("histogram", "histogram_x", "histogram_y"):
+            col = value_col if chart_key == "histogram" else (x_col if chart_key == "histogram_x" else y_col)
+            if col and col in df.columns:
+                parts.append(_interp_histogram(df, col))
+        elif chart_key == "scatter" and x_col in df.columns and y_col in df.columns:
+            parts.append(_interp_scatter(df, x_col, y_col))
+        elif chart_key == "correlation_matrix":
+            parts.append(_interp_correlation_matrix(df))
+        elif chart_key == "contingency" and x_col in df.columns and y_col in df.columns:
+            parts.append(_interp_contingency(df, x_col, y_col))
+    except Exception as exc:
+        logger.warning(f"describe_chart_context: skipping numeric grounding after error: {exc}")
+
+    return "\n".join(p for p in parts if p)
 
 
 # ── Orchestrator ──────────────────────────────────────────────────────

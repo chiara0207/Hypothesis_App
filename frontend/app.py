@@ -5,6 +5,7 @@ Streamlit frontend for the Statistical Hypothesis Testing Assistant.
 import html
 import json
 import time
+import uuid
 from io import BytesIO
 from typing import Any, Dict, List, Optional
 
@@ -64,6 +65,7 @@ for key, default in {
     "example_questions": [],
     "stat_question": "",
     "qa_pending_question": None,
+    "last_stats_result": None,
 }.items():
     if key not in st.session_state:
         st.session_state[key] = default
@@ -252,6 +254,50 @@ def render_source_cards(sources: List[Dict[str, Any]], *, expanded: bool = False
             )
 
 
+def _render_chart_qa(
+    ui_id: str, sid: Optional[str], test_name: str, variables_used: Dict[str, Any],
+    chart_key: str, p_val: Optional[float], alpha: float,
+) -> None:
+    """Mini Q&A thread scoped to a single chart, so users can ask the LLM to explain it further."""
+    if not sid:
+        return
+    chat_key = f"viz_chat_{ui_id}_{chart_key}"
+    if chat_key not in st.session_state:
+        st.session_state[chat_key] = []
+
+    with st.expander("💬 Ask about this chart"):
+        for m in st.session_state[chat_key]:
+            with st.chat_message(m["role"]):
+                st.markdown(m["content"])
+
+        question = st.text_input(
+            "Ask a question about this chart",
+            key=f"input_{chat_key}",
+            placeholder="e.g. Why is the Treatment box higher than Control?",
+            label_visibility="collapsed",
+        )
+        if st.button("Ask", key=f"btn_{chat_key}") and question.strip():
+            history = st.session_state[chat_key][-8:]
+            with st.spinner("Thinking…"):
+                resp = backend(
+                    "POST", "/visualization/ask",
+                    json={
+                        "session_id": sid,
+                        "test_name": test_name,
+                        "variables_used": variables_used,
+                        "chart_key": chart_key,
+                        "question": question,
+                        "history": history,
+                        "p_value": p_val,
+                        "alpha": alpha,
+                    },
+                )
+            st.session_state[chat_key].append({"role": "user", "content": question})
+            if resp and resp.get("answer"):
+                st.session_state[chat_key].append({"role": "assistant", "content": resp["answer"]})
+            st.rerun()
+
+
 def render_stats_result(result: Dict[str, Any], session_id: Optional[str] = None) -> None:
     """Render a statistical analysis result in a structured, professional layout."""
     test_name = html.escape(str(result.get("test_display_name", "Analysis")))
@@ -272,6 +318,7 @@ def render_stats_result(result: Dict[str, Any], session_id: Optional[str] = None
     stat_val = result.get("statistic")
     stat_display = f"{stat_val:.4f}" if stat_val is not None else "—"
     alpha = result.get("alpha", 0.05)
+    ui_id = result.setdefault("_ui_id", str(uuid.uuid4()))
 
     with st.container(border=True):
         st.markdown(
@@ -329,9 +376,33 @@ def render_stats_result(result: Dict[str, Any], session_id: Optional[str] = None
                 chart_tabs = st.tabs([c["title"] for c in charts])
                 for tab, chart in zip(chart_tabs, charts):
                     with tab:
-                        st.plotly_chart(go.Figure(chart["figure"]), use_container_width=True)
+                        st.plotly_chart(
+                            go.Figure(chart["figure"]),
+                            use_container_width=True,
+                            key=f"plot_{ui_id}_{chart['key']}",
+                        )
                         if chart.get("interpretation"):
                             st.caption(chart["interpretation"])
+
+                        handbook = chart.get("handbook") or {}
+                        if handbook:
+                            with st.expander("📖 Learn more about this chart type"):
+                                if handbook.get("what"):
+                                    st.markdown(f"**What it is:** {handbook['what']}")
+                                if handbook.get("how_to_read"):
+                                    st.markdown(f"**How to read it:** {handbook['how_to_read']}")
+                                if handbook.get("when_used"):
+                                    st.markdown(f"**When it's used:** {handbook['when_used']}")
+
+                        _render_chart_qa(
+                            ui_id=ui_id,
+                            sid=sid,
+                            test_name=result.get("test_name", ""),
+                            variables_used=result.get("variables_used") or {},
+                            chart_key=chart["key"],
+                            p_val=p_val,
+                            alpha=alpha,
+                        )
 
         if rationale:
             st.markdown(
@@ -1141,28 +1212,35 @@ with tab_stats:
                 )
 
             if result:
-                if result.get("test_name") == "unsupported":
-                    msg = html.escape(result.get("plain_explanation") or result.get("error", ""))
-                    st.markdown(
-                        f'<div class="stats-unsupported-box"><strong>Not supported</strong><br>{msg}</div>',
-                        unsafe_allow_html=True,
-                    )
-                    rat = result.get("rationale")
-                    if rat and rat != result.get("plain_explanation"):
-                        st.caption(rat)
-                elif result.get("error"):
-                    err = html.escape(str(result["error"]))
-                    st.markdown(
-                        f'<div class="stats-error-box"><strong>Analysis could not be completed</strong><br>{err}</div>',
-                        unsafe_allow_html=True,
-                    )
-                else:
-                    render_stats_result(result)
+                st.session_state.last_stats_result = result
+                if not (result.get("test_name") == "unsupported" or result.get("error")):
                     st.session_state.stats_history.append({
                         "question": stat_question,
                         "result": result,
                         "session_id": st.session_state.csv_session_id,
                     })
+
+        # Render the most recent result unconditionally (not gated on run_btn) so it
+        # survives reruns triggered by unrelated widgets, e.g. the chart Q&A "Ask" button.
+        last_result = st.session_state.last_stats_result
+        if last_result:
+            if last_result.get("test_name") == "unsupported":
+                msg = html.escape(last_result.get("plain_explanation") or last_result.get("error", ""))
+                st.markdown(
+                    f'<div class="stats-unsupported-box"><strong>Not supported</strong><br>{msg}</div>',
+                    unsafe_allow_html=True,
+                )
+                rat = last_result.get("rationale")
+                if rat and rat != last_result.get("plain_explanation"):
+                    st.caption(rat)
+            elif last_result.get("error"):
+                err = html.escape(str(last_result["error"]))
+                st.markdown(
+                    f'<div class="stats-error-box"><strong>Analysis could not be completed</strong><br>{err}</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                render_stats_result(last_result, session_id=st.session_state.csv_session_id)
 
         if st.session_state.stats_history:
             st.markdown('<p class="stats-section-label">Session history</p>', unsafe_allow_html=True)
