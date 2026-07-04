@@ -15,7 +15,8 @@ import requests
 import streamlit as st
 
 # ── Configuration ─────────────────────────────────────────────────
-BACKEND_URL = "http://localhost:8000"
+import os
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 
 
 def backend(method: str, path: str, **kwargs) -> Optional[Dict]:
