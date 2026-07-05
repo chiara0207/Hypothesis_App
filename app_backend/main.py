@@ -14,6 +14,7 @@ from .routers import search as search_router
 from .routers import chat as chat_router
 from .routers import rank as rank_router
 from .routers import visualization as visualization_router
+from .routers import handbook as handbook_router
 from .utils.vector_store import VectorStore
 from .services.qa_engine import QAEngine
 
@@ -65,6 +66,7 @@ def create_app() -> FastAPI:
     app.include_router(chat_router.router, prefix="/chat", tags=["Chat"])
     app.include_router(rank_router.router, prefix="/rank", tags=["Rank"])
     app.include_router(visualization_router.router, prefix="/visualization", tags=["Visualization"])
+    app.include_router(handbook_router.router, prefix="/handbook", tags=["Handbook"])
 
     @app.get("/health")
     def health():

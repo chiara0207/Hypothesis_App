@@ -833,3 +833,198 @@
 2026-07-02 22:15:09,520 - app_backend.routers.visualization - INFO - VIZ ASK: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, chart=violin, question='Is the distribution here skewed or how would you describe the distribution of On'
 2026-07-02 22:15:12,051 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2026-07-02 22:15:12,262 - app_backend.routers.visualization - INFO - VISUALIZATION: session=5a08c90e-b0b7-4085-a9ae-35ae868d05ed, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-05 21:52:24,595 - app_backend.main - INFO - App created and routes registered
+2026-07-05 21:52:24,598 - app_backend.main - INFO - App created and routes registered
+2026-07-05 21:52:56,104 - app_backend.main - INFO - App created and routes registered
+2026-07-05 21:52:56,107 - app_backend.main - INFO - App created and routes registered
+2026-07-05 21:52:56,111 - httpx - INFO - HTTP Request: GET http://testserver/handbook/concepts "HTTP/1.1 200 OK"
+2026-07-05 21:54:26,954 - app_backend.main - INFO - App created and routes registered
+2026-07-05 21:56:34,293 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What is a p-value in simple terms?'
+2026-07-05 21:56:39,017 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 21:57:02,822 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=independent_ttest, question='Why was this specific test chosen, and is my result significant?'
+2026-07-05 21:57:05,792 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 21:59:20,317 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What exactly does a p-value tell me?'
+2026-07-05 21:59:22,560 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:00:12,475 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What exactly does a p-value tell me?'
+2026-07-05 22:00:14,256 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:04:49,063 - app_backend.main - INFO - App created and routes registered
+2026-07-05 22:05:01,310 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:05:01,326 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:05:02,027 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:05:02,526 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:05:02,694 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:05:05,148 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:05:13,381 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:05:13,384 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:05:14,133 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:05:14,337 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:05:14,697 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:05:17,580 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:09:04,054 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:09:04,058 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:09:04,975 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:09:05,075 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:09:05,688 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:09:08,783 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:10:11,457 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:10:11,461 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:10:12,547 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:10:12,777 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:10:13,244 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:10:15,671 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:12:44,871 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:12:44,880 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:12:45,381 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:12:45,619 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:12:45,862 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:12:49,274 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:14:02,139 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:14:02,142 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:14:03,184 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:14:03,583 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:14:04,397 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:14:07,532 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:14:54,115 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:14:54,117 - app_backend.routers.search - INFO - Dataset search: question='Does regular exercise reduce blood pressure in adults with type 2 diabetes?' → query='Exercise effects on blood pressure type 2 diabetes'
+2026-07-05 22:14:54,688 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:14:55,122 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:14:55,299 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:14:58,202 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:26:32,356 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:26:32,363 - app_backend.routers.search - INFO - Dataset search: question='Is education in Germany affordable?\n' → query='affordability of education in Germany'
+2026-07-05 22:26:33,043 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:26:34,248 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:26:34,340 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:26:36,786 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:27:31,469 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:27:31,472 - app_backend.routers.search - INFO - Dataset search: question='Is home schooling or attending school lessons in an actual high school more effective?\n\n\n' → query='Effectiveness of homeschooling versus traditional schooling'
+2026-07-05 22:27:31,797 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:27:31,959 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:27:32,136 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:27:36,281 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:28:27,484 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:28:27,487 - app_backend.routers.search - INFO - Dataset search: question='What factors determine cardiovascular risk?\n\n\n\n\n' → query='factors determining cardiovascular risk'
+2026-07-05 22:28:27,836 - app_backend.routers.search - INFO - DataCite: status=200
+2026-07-05 22:28:27,989 - app_backend.routers.search - INFO - Zenodo: status=200
+2026-07-05 22:28:28,280 - app_backend.routers.search - INFO - OpenAlex Datasets: status=200
+2026-07-05 22:28:30,660 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:28:55,041 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:28:55,045 - app_backend.routers.search - INFO - Paper search: question='What factors determine cardiovascular risk?\n\n\n\n\n' → query='factors determining cardiovascular risk'
+2026-07-05 22:28:55,508 - app_backend.routers.search - INFO - PubMed search: status=200
+2026-07-05 22:28:55,702 - app_backend.routers.search - INFO - arXiv: status=200
+2026-07-05 22:28:56,609 - app_backend.routers.search - INFO - Semantic Scholar: status=429
+2026-07-05 22:28:56,609 - app_backend.routers.search - WARNING - Semantic Scholar rate limited
+2026-07-05 22:28:56,709 - app_backend.routers.search - INFO - OpenAlex: status=200
+2026-07-05 22:28:58,924 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:29:43,324 - app_backend.routers.chat - INFO - Chat message: 'AI fosters the deterioration of the ability of reading in humans'
+2026-07-05 22:29:45,308 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:30:40,208 - app_backend.routers.chat - INFO - Chat message: 'An AI can do almost anything a Human can, right? But humans loose their ability '
+2026-07-05 22:30:42,551 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 22:57:29,695 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What is a p-value?'
+2026-07-05 22:57:32,655 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:17:16,844 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What is a p-value?'
+2026-07-05 23:17:20,743 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:19:14,843 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question="What's the difference between a t-test and ANOVA?"
+2026-07-05 23:19:17,117 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:21:30,096 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question="What does 'statistically significant' actually mean?"
+2026-07-05 23:21:34,137 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:21:54,257 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='Which test is the most frequently chosen?'
+2026-07-05 23:21:56,152 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:26:02,707 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What is a p-value?'
+2026-07-05 23:26:05,709 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:34:16,914 - app_backend.routers.chat - INFO - Chat message: 'Germany has the best universities in Europe'
+2026-07-05 23:34:19,591 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:34:47,910 - app_backend.routers.chat - INFO - Chat message: 'Which criteria do you think should be relevant?'
+2026-07-05 23:34:49,573 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:39:48,417 - app_backend.routers.upload - INFO - CSV upload: sample_anova_teaching.csv
+2026-07-05 23:39:48,453 - app_backend.utils.session_store - INFO - Session created: 74894c17-9afa-4d61-b12a-9e6ef0e84c2f (sample_anova_teaching.csv, 100 rows)
+2026-07-05 23:39:48,477 - app_backend.routers.stats - INFO - EXAMPLES: session=74894c17-9afa-4d61-b12a-9e6ef0e84c2f, n=6
+2026-07-05 23:39:51,684 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:39:54,037 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:39:55,828 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:39:58,007 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:00,146 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:00,155 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about associations between teaching method (categorical) and exam score categories (e.g., Pass vs. Fa
+2026-07-05 23:40:01,616 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:03,698 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:05,510 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:07,697 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:12,368 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:12,369 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about the association between a categorical variable (teaching method) and a numeric variable (study 
+2026-07-05 23:40:13,935 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:13,954 - app_backend.routers.stats - INFO - STATS: session=74894c17-9afa-4d61-b12a-9e6ef0e84c2f, question='Is there a difference in test scores between teaching methods?'
+2026-07-05 23:40:13,958 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-05 23:40:16,046 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:16,052 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-05 23:40:16,054 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-05 23:40:16,054 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-05 23:40:16,075 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-05 23:40:18,725 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:18,748 - app_backend.routers.visualization - INFO - VISUALIZATION: session=74894c17-9afa-4d61-b12a-9e6ef0e84c2f, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-05 23:40:24,893 - app_backend.routers.upload - INFO - PDF upload: sample_paper.pdf
+2026-07-05 23:40:24,895 - app_backend.services.parser - INFO - PDF reader created, pages: 1
+2026-07-05 23:40:24,897 - app_backend.services.parser - INFO - PDF parsed in 0.00s, 949 chars
+2026-07-05 23:40:24,897 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 2 chunks
+2026-07-05 23:40:27,728 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-07-05 23:40:27,738 - app_backend.services.embedder - INFO - Embedded 2 texts in 2.84s (dim=1536)
+2026-07-05 23:40:27,742 - app_backend.utils.vector_store - INFO - VectorStore: 2 total vectors stored
+2026-07-05 23:40:27,742 - app_backend.routers.upload - INFO - PDF ingested: 2 chunks
+2026-07-05 23:40:28,960 - app_backend.routers.qa - INFO - ASK: 'What methodology or study design was used?'
+2026-07-05 23:40:28,961 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What methodology or study design was used?'
+2026-07-05 23:40:29,098 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-07-05 23:40:29,099 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.14s (dim=1536)
+2026-07-05 23:40:30,434 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:30,436 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 1.48s
+2026-07-05 23:40:37,267 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:40:37,270 - app_backend.routers.search - INFO - Paper search: question='Does sleep deprivation impair working memory?' → query='Sleep deprivation effects on working memory'
+2026-07-05 23:40:37,812 - app_backend.routers.search - INFO - Semantic Scholar: status=429
+2026-07-05 23:40:37,813 - app_backend.routers.search - WARNING - Semantic Scholar rate limited
+2026-07-05 23:40:38,204 - app_backend.routers.search - INFO - arXiv: status=200
+2026-07-05 23:40:38,745 - app_backend.routers.search - INFO - PubMed search: status=200
+2026-07-05 23:40:39,503 - app_backend.routers.search - INFO - OpenAlex: status=200
+2026-07-05 23:40:41,964 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:34,950 - app_backend.routers.upload - INFO - CSV upload: sample_anova_teaching.csv
+2026-07-05 23:42:34,951 - app_backend.utils.session_store - INFO - Session created: f32707a4-da16-44b7-81f3-a9da54226b3f (sample_anova_teaching.csv, 100 rows)
+2026-07-05 23:42:34,970 - app_backend.routers.stats - INFO - EXAMPLES: session=f32707a4-da16-44b7-81f3-a9da54226b3f, n=6
+2026-07-05 23:42:38,162 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:39,832 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:41,449 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:43,083 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:47,712 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:47,713 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about the association between a categorical variable (teaching_method) and a numeric variable (exam_s
+2026-07-05 23:42:49,862 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:49,865 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking whether students who study more hours per week score differently on exams, which suggests a compariso
+2026-07-05 23:42:51,438 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:53,526 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:55,406 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:57,235 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:59,181 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:42:59,184 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about the association between a categorical variable (teaching_method) and a numeric variable (study_
+2026-07-05 23:42:59,187 - app_backend.routers.stats - INFO - STATS: session=f32707a4-da16-44b7-81f3-a9da54226b3f, question='Is there a difference in test scores between teaching methods?'
+2026-07-05 23:42:59,190 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-05 23:43:00,912 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:43:00,916 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-05 23:43:00,918 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-05 23:43:00,918 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-05 23:43:00,925 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-05 23:43:03,056 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:43:03,083 - app_backend.routers.visualization - INFO - VISUALIZATION: session=f32707a4-da16-44b7-81f3-a9da54226b3f, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+2026-07-05 23:43:06,876 - app_backend.routers.upload - INFO - PDF upload: sample_paper.pdf
+2026-07-05 23:43:06,876 - app_backend.services.parser - INFO - PDF reader created, pages: 1
+2026-07-05 23:43:06,878 - app_backend.services.parser - INFO - PDF parsed in 0.00s, 949 chars
+2026-07-05 23:43:06,878 - app_backend.services.chunker - INFO - Chunking done in 0.00s → 2 chunks
+2026-07-05 23:43:07,142 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-07-05 23:43:07,145 - app_backend.services.embedder - INFO - Embedded 2 texts in 0.27s (dim=1536)
+2026-07-05 23:43:07,145 - app_backend.utils.vector_store - INFO - VectorStore: 4 total vectors stored
+2026-07-05 23:43:07,145 - app_backend.routers.upload - INFO - PDF ingested: 2 chunks
+2026-07-05 23:43:10,899 - app_backend.routers.qa - INFO - ASK: 'What methodology or study design was used?'
+2026-07-05 23:43:10,899 - app_backend.services.qa_engine - INFO - QAEngine.answer: 'What methodology or study design was used?'
+2026-07-05 23:43:11,029 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-07-05 23:43:11,034 - app_backend.services.embedder - INFO - Embedded 1 texts in 0.13s (dim=1536)
+2026-07-05 23:43:12,462 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:43:12,469 - app_backend.services.qa_engine - INFO - QAEngine answer generated in 1.57s
+2026-07-05 23:43:19,039 - app_backend.routers.rank - INFO - Ranking 1 papers for question: 'Does sleep deprivation impair working memory?'
+2026-07-05 23:43:19,296 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-07-05 23:43:21,528 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-05 23:43:23,956 - app_backend.routers.chat - INFO - Chat message: 'Is consciousness just an illusion?'
+2026-07-05 23:43:25,704 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"

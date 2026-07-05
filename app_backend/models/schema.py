@@ -103,3 +103,37 @@ class VisualizationChatRequest(BaseModel):
 
 class VisualizationChatResponse(BaseModel):
     answer: str
+
+# ── Statistical Handbook ──────────────────────────────────────────
+
+class HandbookConcept(BaseModel):
+    key: str
+    title: str
+    category: str
+    what: str
+    why_it_matters: str
+    example: str
+
+class HandbookResponse(BaseModel):
+    concepts: List[HandbookConcept] = []
+
+class HandbookChatMessage(BaseModel):
+    role: str
+    content: str
+
+class HandbookChatRequest(BaseModel):
+    question: str = Field(..., example="Why does a small p-value make us reject the null hypothesis?")
+    history: List[HandbookChatMessage] = Field(default_factory=list, description="Prior turns of this Q&A thread")
+    # Optional grounding in a specific, already-computed test result so the
+    # chatbot can explain *this* result rather than only definitions.
+    test_name: Optional[str] = Field(None, description="e.g. 'independent_ttest', if grounding in a completed analysis")
+    variables_used: Dict[str, str] = {}
+    rationale: Optional[str] = None
+    statistic: Optional[float] = None
+    p_value: Optional[float] = None
+    alpha: float = 0.05
+    significant: Optional[bool] = None
+    assumption_checks: List[AssumptionCheck] = []
+
+class HandbookChatResponse(BaseModel):
+    answer: str

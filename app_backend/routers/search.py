@@ -1,4 +1,6 @@
+import html as html_lib
 import logging
+import re
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Optional
@@ -37,6 +39,30 @@ class PaperResult(BaseModel):
 class SearchResponse(BaseModel):
     query_used: str
     results: List[PaperResult]
+    total_found: int
+    summary: Optional[str] = None
+
+
+class DatasetSearchRequest(BaseModel):
+    question: str
+    limit: int = 10
+    sources: List[str] = ["Zenodo", "DataCite", "OpenAlex Datasets"]
+
+
+class DatasetResult(BaseModel):
+    title: str
+    description: Optional[str]
+    authors: List[str] = []
+    year: Optional[int]
+    doi: Optional[str]
+    dataset_url: Optional[str]
+    file_formats: List[str] = []
+    source: str = "Unknown"
+
+
+class DatasetSearchResponse(BaseModel):
+    query_used: str
+    results: List[DatasetResult]
     total_found: int
     summary: Optional[str] = None
 
@@ -98,6 +124,50 @@ def _generate_summary(question: str, papers: List[dict]) -> str:
         max_tokens=300,
     )
     return resp.choices[0].message.content.strip()
+
+
+def _generate_dataset_summary(question: str, datasets: List[dict]) -> str:
+    from openai import OpenAI
+    client = OpenAI(api_key=config.OPENAI_API_KEY)
+
+    snippets = []
+    for i, d in enumerate(datasets[:8], 1):
+        desc = (d.get("description") or "No description available.")[:300]
+        snippets.append(f"{i}. {d.get('title', 'Untitled')} ({d.get('year', '')}) — {d.get('source', '')}\n{desc}")
+    listing = "\n\n".join(snippets)
+
+    resp = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a research data librarian. Given a user's hypothesis and a list of retrieved "
+                    "datasets, write a concise synthesis (3-5 sentences) that: "
+                    "(1) summarises what kinds of datasets are available and what variables/populations they cover, "
+                    "(2) flags which ones look most directly usable for testing this hypothesis, "
+                    "(3) notes gaps such as missing variables, small samples, or no open access. "
+                    "Be direct and practical. Do not list datasets by number."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"Hypothesis: {question}\n\nRetrieved datasets:\n{listing}",
+            },
+        ],
+        temperature=0.3,
+        max_tokens=300,
+    )
+    return resp.choices[0].message.content.strip()
+
+
+def _strip_html(text: Optional[str]) -> Optional[str]:
+    if not text:
+        return None
+    clean = re.sub(r"<[^>]+>", " ", text)
+    clean = html_lib.unescape(clean)
+    clean = re.sub(r"\s+", " ", clean).strip()
+    return clean or None
 
 
 # ── Source search functions ───────────────────────────────────────────────────
@@ -287,6 +357,122 @@ def _search_openalex(query: str, limit: int) -> List[dict]:
     return results
 
 
+# ── Dataset source search functions ───────────────────────────────────────────
+
+def _search_zenodo(query: str, limit: int) -> List[dict]:
+    try:
+        resp = requests.get(
+            "https://zenodo.org/api/records",
+            params={"q": query, "size": min(limit, 20), "type": "dataset", "sort": "bestmatch"},
+            headers={"User-Agent": "HypothesisApp/1.0"},
+            timeout=15,
+        )
+        logger.info("Zenodo: status=%d", resp.status_code)
+        resp.raise_for_status()
+        raw = resp.json().get("hits", {}).get("hits", [])
+    except Exception as e:
+        logger.error("Zenodo failed: %s", e)
+        return []
+
+    results = []
+    for r in raw:
+        meta = r.get("metadata", {})
+        files = r.get("files") or []
+        formats = sorted({
+            f["key"].rsplit(".", 1)[-1].upper()
+            for f in files if f.get("key") and "." in f["key"]
+        })
+        pub_date = meta.get("publication_date", "") or ""
+        year = int(pub_date[:4]) if pub_date[:4].isdigit() else None
+        results.append({
+            "title": meta.get("title", "Untitled"),
+            "description": _strip_html(meta.get("description")),
+            "authors": [c.get("name", "") for c in (meta.get("creators") or [])],
+            "year": year,
+            "doi": r.get("doi"),
+            "dataset_url": (r.get("links") or {}).get("self_html"),
+            "file_formats": formats,
+            "source": "Zenodo",
+        })
+    return results
+
+
+def _search_datacite(query: str, limit: int) -> List[dict]:
+    try:
+        resp = requests.get(
+            "https://api.datacite.org/dois",
+            params={"query": query, "resource-type-id": "dataset", "page[size]": min(limit, 20)},
+            headers={"User-Agent": "HypothesisApp/1.0"},
+            timeout=15,
+        )
+        logger.info("DataCite: status=%d", resp.status_code)
+        resp.raise_for_status()
+        raw = resp.json().get("data", [])
+    except Exception as e:
+        logger.error("DataCite failed: %s", e)
+        return []
+
+    results = []
+    for d in raw:
+        attrs = d.get("attributes", {})
+        titles = attrs.get("titles") or []
+        descriptions = attrs.get("descriptions") or []
+        results.append({
+            "title": (titles[0].get("title") if titles else None) or "Untitled",
+            "description": (descriptions[0].get("description") if descriptions else None),
+            "authors": [c.get("name", "") for c in (attrs.get("creators") or [])],
+            "year": attrs.get("publicationYear"),
+            "doi": attrs.get("doi"),
+            "dataset_url": attrs.get("url"),
+            "file_formats": [f.upper() for f in (attrs.get("formats") or [])],
+            "source": "DataCite",
+        })
+    return results
+
+
+def _search_openalex_datasets(query: str, limit: int) -> List[dict]:
+    try:
+        resp = requests.get(
+            "https://api.openalex.org/works",
+            params={
+                "search": query,
+                "filter": "type:dataset",
+                "per-page": min(limit, 25),
+                "select": "title,authorships,abstract_inverted_index,publication_year,doi,open_access,id",
+            },
+            headers={"User-Agent": "HypothesisApp/1.0"},
+            timeout=15,
+        )
+        logger.info("OpenAlex Datasets: status=%d", resp.status_code)
+        resp.raise_for_status()
+        raw = resp.json().get("results", [])
+    except Exception as e:
+        logger.error("OpenAlex Datasets failed: %s", e)
+        return []
+
+    results = []
+    for p in raw:
+        doi_full = p.get("doi") or ""
+        doi = doi_full.replace("https://doi.org/", "") or None
+        oa = p.get("open_access") or {}
+        authors = [
+            a["author"]["display_name"]
+            for a in (p.get("authorships") or [])
+            if a.get("author")
+        ]
+        results.append({
+            "title": p.get("title", "Untitled"),
+            "description": _reconstruct_abstract(p.get("abstract_inverted_index") or {}),
+            "authors": authors,
+            "year": p.get("publication_year"),
+            "doi": doi,
+            "dataset_url": oa.get("oa_url") or p.get("id"),
+            "file_formats": [],
+            "source": "OpenAlex Datasets",
+        })
+    return results
+
+
 # ── Deduplication ─────────────────────────────────────────────────────────────
 
 def _normalise_title(title: str) -> str:
@@ -354,6 +540,58 @@ def search_papers(req: SearchRequest):
     summary = _generate_summary(req.question, [p for p in unique if p.get("abstract")])
 
     return SearchResponse(
+        query_used=query,
+        results=results,
+        total_found=len(results),
+        summary=summary,
+    )
+
+
+DATASET_SOURCE_MAP = {
+    "Zenodo": _search_zenodo,
+    "DataCite": _search_datacite,
+    "OpenAlex Datasets": _search_openalex_datasets,
+}
+
+
+@router.post("/datasets", response_model=DatasetSearchResponse)
+def search_datasets(req: DatasetSearchRequest):
+    """
+    Find statistical datasets that match a hypothesis, using the same
+    keyword-extraction step as paper search but against open dataset
+    registries (Zenodo, DataCite, OpenAlex works filtered to type=dataset)
+    instead of paper indexes.
+    """
+    query = _extract_keywords(req.question)
+    logger.info("Dataset search: question=%r → query=%r", req.question, query)
+
+    per_source = max(req.limit, 10)
+    selected = [s for s in req.sources if s in DATASET_SOURCE_MAP]
+    if not selected:
+        raise HTTPException(status_code=400, detail="No valid sources selected.")
+
+    all_datasets: List[dict] = []
+    with ThreadPoolExecutor(max_workers=len(selected)) as executor:
+        futures = {
+            executor.submit(DATASET_SOURCE_MAP[src], query, per_source): src
+            for src in selected
+        }
+        for future in as_completed(futures):
+            src = futures[future]
+            try:
+                all_datasets.extend(future.result())
+            except Exception as e:
+                logger.error("Source %s raised: %s", src, e)
+
+    unique = _deduplicate(all_datasets)
+    # Sort: prefer datasets with a description, then more recent ones
+    unique.sort(key=lambda d: (d.get("description") is None, -(d.get("year") or 0)))
+    unique = unique[: req.limit * 2]
+
+    results = [DatasetResult(**d) for d in unique]
+    summary = _generate_dataset_summary(req.question, [d for d in unique if d.get("description")])
+
+    return DatasetSearchResponse(
         query_used=query,
         results=results,
         total_found=len(results),

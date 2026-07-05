@@ -6,6 +6,7 @@ pydantic>=2.0
 
 # Frontend
 streamlit>=1.32.0
+streamlit-option-menu>=0.3.6
 
 # PDF parsing
 PyPDF2>=3.0.0
