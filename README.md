@@ -11,11 +11,12 @@ A research tool for students and academics. Upload **PDFs** and **CSV/XLSX datas
 | **Ask Questions** | Chat with an uploaded research PDF using RAG (retrieval-augmented generation) |
 | **Statistical Analysis** | Describe a hypothesis in plain language — the AI picks the right test, SciPy runs it, the AI explains the results. Results come with an interactive Plotly chart suite (boxplot, violin, bell curve, histogram, scatter, correlation matrix, or contingency heatmap depending on the test), a plain-language caption and handbook per chart, and a mini chat to ask follow-up questions about any chart. Export to CSV or XLSX. |
 | **Data Preview** | Inspect columns, types, and sample rows from your uploaded dataset |
-| **Find Papers** | Enter a research question — searches Semantic Scholar, arXiv, PubMed, and OpenAlex in parallel and summarises the literature with an LLM |
+| **Find Papers & Datasets** | Enter a research question — searches Semantic Scholar, arXiv, PubMed, and OpenAlex in parallel and summarises the literature with an LLM; or switch to dataset mode to search Zenodo, DataCite, and OpenAlex Datasets for open data matching your hypothesis |
 | **Hypothesis Chat** | Chat about any hypothesis, scientific or wild — the AI engages thoughtfully and asks follow-up questions |
 | **Rank Papers** | Upload up to 20 PDFs — the AI ranks them by relevance to your research question with explanations and key quotes. Export to Word or PDF. |
+| **Statistics Handbook** | Look up core statistics concepts and every supported hypothesis test in plain language, or ask the built-in chatbot — answers ground themselves in your actual test result when one is available. |
 
-The UI is a **Streamlit** app; all heavy logic lives in a **FastAPI** backend. They communicate over HTTP on `localhost`.
+The UI is a **Next.js** app (`frontend-web/`); all heavy logic lives in a **FastAPI** backend. They communicate over HTTP on `localhost`.
 
 ---
 
@@ -26,11 +27,11 @@ The UI is a **Streamlit** app; all heavy logic lives in a **FastAPI** backend. T
 - [Startup](#startup)
 - [Flow 1: PDF upload and Q&A](#flow-1-pdf-upload-and-qa)
 - [Flow 2: Dataset upload and statistical analysis](#flow-2-dataset-upload-and-statistical-analysis)
-- [Flow 3: Find Papers](#flow-3-find-papers)
+- [Flow 3: Find Papers & Datasets](#flow-3-find-papers--datasets)
 - [Flow 4: Hypothesis Chat](#flow-4-hypothesis-chat)
 - [Flow 5: Rank Papers](#flow-5-rank-papers)
 - [Export options](#export-options)
-- [Frontend session state](#frontend-session-state)
+- [Frontend state](#frontend-state)
 - [Backend modules reference](#backend-modules-reference)
 - [API endpoints](#api-endpoints)
 - [Supported statistical tests](#supported-statistical-tests)
@@ -42,19 +43,20 @@ The UI is a **Streamlit** app; all heavy logic lives in a **FastAPI** backend. T
 
 ```mermaid
 flowchart TD
-    Browser(["Browser"]) --> UI["Streamlit UI\nfrontend/app.py — :8501"]
-    UI -- "HTTP (requests)" --> API["FastAPI backend\napp_backend/main.py — :8000"]
+    Browser(["Browser"]) --> UI["Next.js frontend-web\nsrc/app/* — :3000"]
+    UI -- "HTTP (fetch via lib/api.ts)" --> API["FastAPI backend\napp_backend/main.py — :8000"]
 
     subgraph Routers["FastAPI routers"]
         RUpload["/upload/pdf\n/upload/csv"]
         RQA["/qa/ask"]
         RStats["/stats/analyze\n/stats/examples"]
         RViz["/visualization/suite\n/visualization/ask"]
-        RSearch["/search/papers"]
+        RSearch["/search/papers\n/search/datasets"]
         RChat["/chat/message"]
         RRank["/rank/papers"]
+        RHandbook["/handbook/concepts\n/handbook/ask"]
     end
-    API --> RUpload & RQA & RStats & RViz & RSearch & RChat & RRank
+    API --> RUpload & RQA & RStats & RViz & RSearch & RChat & RRank & RHandbook
 
     RUpload --> PdfPipe["parser → chunker → embedder"] --> VecStore[("VectorStore\nFAISS IndexFlatIP")]
     RUpload --> SessionStore[("session_store\nsession_id → DataFrame")]
@@ -70,12 +72,16 @@ flowchart TD
     VizService --> SessionStore
     VizService --> OpenAI
 
-    RSearch --> Academic["Semantic Scholar · arXiv\nPubMed · OpenAlex (free, no keys)"]
+    RSearch --> Academic["Semantic Scholar · arXiv\nPubMed · OpenAlex (papers, free, no keys)"]
+    RSearch --> DataReg["Zenodo · DataCite\nOpenAlex Datasets (free, no keys)"]
     RSearch --> OpenAI
 
     RChat --> OpenAI
 
     RRank --> RankLogic["PyPDF2 extract → embeddings → cosine rank → LLM explain"] --> OpenAI
+
+    RHandbook --> HandbookService["handbook_service.py\nconcept glossary + grounded test-result Q&A"]
+    HandbookService --> OpenAI
 
     OpenAI["OpenAI API\ngpt-4o-mini · text-embedding-3-small"]
 ```
@@ -91,15 +97,17 @@ npx @mermaid-js/mermaid-cli -i /tmp/arch.mmd -o docs/architecture.png -w 1600 -H
 
 | Layer | Technology | Role |
 |-------|------------|------|
-| Frontend | Streamlit | File uploads, tabs, chat UI, results display, export |
+| Frontend | Next.js (App Router), TypeScript | Pages/nav, file uploads, chat UI, results display, export |
 | API | FastAPI | REST endpoints, CORS, shared singletons |
 | PDF pipeline | PyPDF2, chunker, OpenAI embeddings | Index document for search |
 | Vector search | FAISS (or numpy fallback) | Similarity search over chunk embeddings |
 | Data | pandas | Load CSV/XLSX, profile schema, run tests |
 | Statistics | SciPy, statsmodels | Actual hypothesis tests |
 | Visualization | Plotly (`graph_objects`) | Gauge, boxplot, violin, bell curve, histogram, scatter, correlation matrix, contingency heatmap |
-| Intelligence | OpenAI (`gpt-4o-mini`, `text-embedding-3-small`) | Test selection, Q&A, explanations, summaries, chat, chart Q&A |
+| Intelligence | OpenAI (`gpt-4o-mini`, `text-embedding-3-small`) | Test selection, Q&A, explanations, summaries, chat, chart Q&A, handbook Q&A |
 | Academic search | Semantic Scholar, arXiv, PubMed, OpenAlex APIs | Free paper search — no API keys required |
+| Dataset search | Zenodo, DataCite, OpenAlex Datasets APIs | Free open-dataset search — no API keys required |
+| Handbook | `handbook_service.py` | Statistics concept glossary + grounded chatbot over a computed result |
 | Export | python-docx, reportlab, openpyxl | Word, PDF, XLSX file generation |
 
 ---
@@ -108,8 +116,27 @@ npx @mermaid-js/mermaid-cli -i /tmp/arch.mmd -o docs/architecture.png -w 1600 -H
 
 ```
 Hypothesis_App/
-├── frontend/
-│   └── app.py                  # Streamlit UI — all 6 tabs, export helpers
+├── frontend-web/                       # Next.js (App Router) UI
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx                # Landing page
+│   │   │   ├── hypothesis-chat/        # Flow 4
+│   │   │   ├── ask-questions/          # Flow 1
+│   │   │   ├── find/                   # Flow 3 (papers + datasets)
+│   │   │   ├── rank-papers/            # Flow 5
+│   │   │   ├── statistical-analysis/   # Flow 2
+│   │   │   ├── handbook/               # Statistics Handbook
+│   │   │   └── data-preview/           # Dataset column/row inspection
+│   │   ├── components/
+│   │   │   ├── AppShell.tsx            # Sidebar nav + PDF/CSV upload tiles
+│   │   │   ├── ChartCard.tsx           # Plotly chart + handbook/Q&A expanders
+│   │   │   └── PlotlyChart.tsx         # Plotly.js wrapper
+│   │   └── lib/
+│   │       ├── api.ts                  # fetch wrapper (BACKEND_URL, JSON/multipart)
+│   │       ├── store.ts                # Zustand — PDF/CSV/stats global state
+│   │       ├── nav.ts                  # Sidebar nav items
+│   │       └── types.ts                # Shared TS types
+│   └── .env.local                      # NEXT_PUBLIC_BACKEND_URL
 ├── app_backend/
 │   ├── main.py                 # FastAPI app factory, wires routers + singletons
 │   ├── config.py               # Loads .env, OpenAI and path settings
@@ -119,17 +146,19 @@ Hypothesis_App/
 │   │   ├── qa.py               # POST /qa/ask
 │   │   ├── stats.py            # POST /stats/analyze, /stats/examples
 │   │   ├── visualization.py    # POST /visualization/suite, /visualization/ask
-│   │   ├── search.py           # POST /search/papers (multi-source academic search)
+│   │   ├── search.py           # POST /search/papers, /search/datasets (multi-source search)
 │   │   ├── chat.py             # POST /chat/message (hypothesis chatbot)
-│   │   └── rank.py             # POST /rank/papers (PDF relevance ranking)
+│   │   ├── rank.py             # POST /rank/papers (PDF relevance ranking)
+│   │   └── handbook.py         # GET /handbook/concepts, POST /handbook/ask
 │   ├── services/
 │   │   ├── parser.py           # PDF → text
 │   │   ├── chunker.py          # Text → overlapping chunks
 │   │   ├── embedder.py         # Text → OpenAI vectors
 │   │   ├── qa_engine.py        # RAG question answering
 │   │   ├── stats_service.py    # Profile → select test → run → explain
-│   │   └── visualization_service.py  # Test result → Plotly chart suite +
-│   │                                  # handbook + LLM chart Q&A context
+│   │   ├── visualization_service.py  # Test result → Plotly chart suite +
+│   │   │                              # handbook + LLM chart Q&A context
+│   │   └── handbook_service.py # Concept glossary + grounded test-result Q&A
 │   └── utils/
 │       ├── vector_store.py     # FAISS IndexFlatIP or numpy fallback
 │       └── session_store.py    # session_id → DataFrame
@@ -171,25 +200,36 @@ Copy `.env.example` to `.env` and add your OpenAI API key:
 OPENAI_API_KEY=sk-...
 ```
 
+`frontend-web/.env.local` already points at the local backend by default:
+
+```
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+```
+
 ### 4. Start the backend (Terminal 1)
 
 ```bash
 uvicorn app_backend.main:app --reload --port 8000
 ```
 
-### 5. Start the frontend (Terminal 2)
+### 5. Install and start the frontend (Terminal 2)
 
 ```bash
-streamlit run frontend/app.py
+cd frontend-web
+npm install   # first time only
+npm run dev
 ```
 
-Open **http://localhost:8501** in your browser.
+Open **http://localhost:3000** in your browser.
 
 ### Restarting after changes
 
 ```bash
-# Stop with Ctrl+C, then:
-source myenv/bin/activate && streamlit run frontend/app.py
+# Backend: stop with Ctrl+C, then:
+source myenv/bin/activate && uvicorn app_backend.main:app --reload --port 8000
+
+# Frontend: Next.js hot-reloads on save; restart only if it hangs:
+cd frontend-web && npm run dev
 ```
 
 ---
@@ -205,7 +245,7 @@ User picks PDF in sidebar
         → chunker.py: ~1000-token chunks with 200-token overlap
         → embedder.py: OpenAI text-embedding-3-small for all chunks
         → vector_store.py: FAISS IndexFlatIP stores normalised vectors
-    → pdf_uploaded = True in session state
+    → Zustand store marks the PDF as uploaded (sidebar tile in AppShell)
 
 User asks a question
     → POST /qa/ask { question, top_k: 5 }
@@ -237,8 +277,8 @@ User types a question → "Run Analysis"
         → Phase D: LLM writes technical + plain-language explanation
     → Results: test badge, p-value, significance, rationale,
                variables used, assumption checks, interpretations
-    → Result persisted in session state (survives reruns) and added
-      to session history → exportable as CSV or XLSX
+    → Result persisted in the Zustand store (survives navigating to other
+      tabs and back) and added to stats history → exportable as CSV or XLSX
 
 Result renders → POST /visualization/suite { session_id, test_name,
                                               variables_used, p_value, alpha }
@@ -275,9 +315,9 @@ User asks a follow-up question in a chart's Q&A box
 
 ---
 
-## Flow 3: Find Papers
+## Flow 3: Find Papers & Datasets
 
-Use this to **discover relevant academic papers** for a research question.
+Use this to **discover relevant academic papers, or open datasets**, for a research question. A mode toggle on the page switches between the two.
 
 ```
 User types research question → selects sources → "Search Papers"
@@ -293,9 +333,21 @@ User types research question → selects sources → "Search Papers"
         → LLM generates a 3-5 sentence literature synthesis
     → UI shows: source badge, authors, year, citations, abstract,
                 links (Semantic Scholar, PDF, DOI), LLM summary above list
+
+User switches to "Datasets" mode → selects sources → "Search Datasets"
+    → POST /search/datasets { question, limit, sources }
+        → Same keyword-extraction step, queried against open dataset registries:
+            • Zenodo API
+            • DataCite API
+            • OpenAlex API filtered to type=dataset
+        → Results deduplicated by DOI and normalised title
+        → Sorted: datasets with a description first, then most recent
+        → LLM generates a short synthesis of what's available
+    → UI shows: source badge, authors, year, description, file formats,
+                dataset link, LLM summary above list
 ```
 
-All four sources are free — no API keys required.
+All seven sources (four paper, three dataset) are free — no API keys required.
 
 ---
 
@@ -355,20 +407,22 @@ Export buttons appear automatically once results are available.
 
 ---
 
-## Frontend session state
+## Frontend state
 
-| Key | Purpose |
-|-----|---------|
-| `pdf_uploaded`, `pdf_filename` | PDF tab enabled / label |
-| `csv_session_id`, `csv_filename`, `csv_columns`, `csv_dtypes`, `csv_preview`, `csv_rows` | Dataset identity and preview |
-| `chat_history` | Q&A messages `{role, content, sources?}` |
-| `stats_history` | Past analyses for history expander and export |
-| `example_questions`, `stat_question` | Stats tab UI state |
-| `last_stats_result` | Most recent analysis result, rendered unconditionally each run so it survives reruns triggered by unrelated widgets (e.g. a chart's "Ask" button) |
-| `viz_chat_{ui_id}_{chart_key}` | Per-chart Q&A conversation thread; `ui_id` is a UUID stamped onto each result the first time it renders |
-| `search_results`, `search_query_used`, `search_summary` | Find Papers results |
-| `hyp_chat_history` | Hypothesis Chat conversation |
-| `rank_results`, `rank_question` | Rank Papers results |
+`frontend-web` splits state into a small global **Zustand** store (`lib/store.ts`) for what needs to survive moving between pages, and plain **React `useState`** local to each page for everything else.
+
+| Store | Key | Purpose |
+|-------|-----|---------|
+| Zustand (global) | `pdfUploaded`, `pdfFilename` | Drives the PDF upload tile in `AppShell`'s sidebar, visible on every page |
+| Zustand (global) | `csvSessionId`, `csvFilename`, `csvColumns`, `csvDtypes`, `csvPreview`, `csvRows` | Dataset identity/preview, shared by the sidebar tile, Data Preview, and Statistical Analysis pages |
+| Zustand (global) | `lastStatsResult` | Most recent analysis result, so it's still shown if the user navigates away and back |
+| Zustand (global) | `statsHistory` | Past analyses for the history list and CSV/XLSX export |
+| Local (`ask-questions`) | chat messages `{role, content, sources?}` | Q&A conversation — resets on navigation away |
+| Local (`statistical-analysis`) | per-chart Q&A thread, keyed by chart | Chart follow-up conversations — resets on navigation away |
+| Local (`find`) | `mode`, `queryUsed`, `summary`, `paperResults`/`datasetResults` | Find Papers & Datasets results — resets on navigation away |
+| Local (`hypothesis-chat`) | chat history | Hypothesis Chat conversation — resets on navigation away |
+| Local (`rank-papers`) | `question`, `files`, `papers` | Rank Papers results — resets on navigation away |
+| Local (`handbook`) | chat history | Handbook chatbot conversation — resets on navigation away |
 
 ---
 
@@ -382,15 +436,17 @@ Export buttons appear automatically once results are available.
 | `routers/qa.py` | Delegates to `QAEngine` |
 | `routers/stats.py` | Loads session DataFrame, calls stats pipeline |
 | `routers/visualization.py` | Loads session DataFrame, calls chart-suite builder / chart Q&A |
-| `routers/search.py` | Keyword extraction, parallel multi-source search, deduplication, LLM summary |
+| `routers/search.py` | Keyword extraction, parallel multi-source search (papers and datasets), deduplication, LLM summary |
 | `routers/chat.py` | Hypothesis chatbot with conversation history |
 | `routers/rank.py` | PDF text extraction, embedding, cosine ranking, LLM explanations |
+| `routers/handbook.py` | Concept glossary endpoint; grounded Q&A over a computed test result |
 | `services/parser.py` | PDF → text (PyPDF2) |
 | `services/chunker.py` | Overlapping text chunks for RAG |
 | `services/embedder.py` | OpenAI embedding batches |
 | `services/qa_engine.py` | Retrieve chunks + generate answer |
 | `services/stats_service.py` | Profile → LLM select → SciPy → LLM explain |
 | `services/visualization_service.py` | Test result → Plotly chart suite, plain-language captions, chart handbook, and grounded context for chart Q&A |
+| `services/handbook_service.py` | Statistics concept glossary + describes a test result's numbers for grounded chatbot answers |
 | `utils/vector_store.py` | FAISS `IndexFlatIP` or numpy fallback |
 | `utils/session_store.py` | In-memory `session_id` → `{df, filename}` |
 
@@ -408,8 +464,11 @@ Export buttons appear automatically once results are available.
 | `POST` | `/visualization/suite` | Build the Plotly chart suite + captions + handbook for a result |
 | `POST` | `/visualization/ask` | Answer a follow-up question about one chart, grounded in its real numbers |
 | `POST` | `/search/papers` | Multi-source academic paper search |
+| `POST` | `/search/datasets` | Multi-source open dataset search |
 | `POST` | `/chat/message` | Hypothesis chatbot turn |
 | `POST` | `/rank/papers` | Rank uploaded PDFs by relevance to a question |
+| `GET` | `/handbook/concepts` | Full statistics concept + test glossary |
+| `POST` | `/handbook/ask` | Answer a statistics question, grounded in a test result if supplied |
 | `GET` | `/health` | `{ "status": "ok" }` |
 
 Interactive docs: **http://localhost:8000/docs**
@@ -450,3 +509,9 @@ Every active test also gets the p-value-vs-alpha gauge. Parametric tests include
 | `OPENAI_MAX_CONTEXT_CHARS` | `12000` | Max retrieved context length for Q&A |
 | `OPENAI_MAX_OUTPUT_TOKENS` | `1500` | Max tokens for generated answers/explanations |
 | `UPLOAD_DIR` | `/tmp/stat_app_uploads` | Upload directory (created automatically) |
+
+`frontend-web/.env.local` (frontend, not backend):
+
+| Variable | Default | Description |
+|----------|---------|--------------|
+| `NEXT_PUBLIC_BACKEND_URL` | `http://localhost:8000` | Base URL the Next.js app calls for all API requests (`lib/api.ts`) |
