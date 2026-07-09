@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import List
 
@@ -134,7 +135,7 @@ async def rank_papers(
         papers.append({"filename": f.filename, "text": text})
 
     texts_to_embed = [question] + [p["text"] if p["text"] else p["filename"] for p in papers]
-    vectors = _embed(texts_to_embed)
+    vectors = await asyncio.to_thread(_embed, texts_to_embed)
     question_vec = vectors[0]
     paper_vecs = vectors[1:]
 
@@ -144,7 +145,11 @@ async def rank_papers(
     papers_with_text = [p for p in papers if p["text"]]
     papers_without_text = [p for p in papers if not p["text"]]
 
-    explanations = _generate_explanations(question, papers_with_text) if papers_with_text else []
+    explanations = (
+        await asyncio.to_thread(_generate_explanations, question, papers_with_text)
+        if papers_with_text
+        else []
+    )
 
     for i, p in enumerate(papers_with_text):
         p["explanation"] = explanations[i]["explanation"]

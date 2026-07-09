@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import traceback
 
@@ -106,7 +107,8 @@ async def ask(request: VisualizationChatRequest):
             messages.append({"role": msg.role, "content": msg.content})
         messages.append({"role": "user", "content": request.question})
 
-        resp = client.chat.completions.create(
+        resp = await asyncio.to_thread(
+            client.chat.completions.create,
             model=config.OPENAI_CHAT_MODEL,
             messages=messages,
             temperature=0.4,

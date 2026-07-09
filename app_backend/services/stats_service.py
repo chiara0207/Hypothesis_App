@@ -23,6 +23,7 @@ import json
 import logging
 import re
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -148,6 +149,10 @@ ACTIVE_TEST_DESCRIPTIONS = {
     "chi_square": (
         "Chi-Square Test — checks whether two categorical variables are associated "
         "(e.g. smoking status vs. disease diagnosis)."
+    ),
+    "one_way_anova": (
+        "One-Way ANOVA — compares the mean of a numeric variable across 3 or more "
+        "distinct groups (e.g. exam scores across 3 teaching methods)."
     ),
 }
 
@@ -467,12 +472,17 @@ def select_test_via_llm(question: str, schema_profile: Dict[str, Any]) -> Dict[s
         "4. chi_square\n"
         "   REQUIRES:\n"
         "   • Exactly TWO categorical (non-numeric) columns\n"
+        "   Does NOT apply to one categorical + one numeric column — see one_way_anova below.\n\n"
 
         "5. one_way_anova\n"
         "   REQUIRES:\n"
         "   • Exactly ONE numeric outcome column (e.g. score, weight, price)\n"
         "   • Exactly ONE categorical grouping column with 3 OR MORE distinct categories\n"
         "     (e.g. teaching method, region, treatment group)\n"
+        "   IMPORTANT: questions phrased as an 'association', 'relationship', or 'link' between\n"
+        "   ONE categorical column (3+ groups) and ONE numeric column are ALSO answered by\n"
+        "   one_way_anova — do not reject these as unsupported and do not confuse them with\n"
+        "   chi_square, which only applies when BOTH columns are categorical.\n"
         "   USE THIS when the question asks about differences across 3+ groups.\n"
         "   Variables: set 'y' = numeric outcome, 'group' = categorical grouping column.\n\n"
 
@@ -1311,28 +1321,36 @@ def generate_valid_example_questions(df: pd.DataFrame, n: int = 6) -> List[str]:
         logger.warning(f"LLM example generation failed: {exc}")
 
     # ── Step 3: validate each candidate by dry-running the test selector ──
-    valid_questions: List[str] = []
-    for q in candidates:
-        if len(valid_questions) >= n:
-            break
+    # Each validation is its own OpenAI call; running them concurrently instead
+    # of in a sequential loop turns ~10 * 2-3s (20-30s) into ~1 call's worth of
+    # wall time.
+    def _validate_candidate(q: str) -> Optional[str]:
         try:
             sel = select_test_via_llm(q, schema_profile)
             if sel.get("test") == UNSUPPORTED_TEST:
                 logger.debug(f"Example question rejected (unsupported): {q}")
-                continue
+                return None
             test = sel.get("test")
             variables = sel.get("variables") or {}
             # Also run normalization to catch column-mismatch errors
             normalize_test_selection(df, test, variables, q)
-            valid_questions.append(q)
+            return q
         except Exception as exc:
             logger.debug(f"Example question failed validation ({exc}): {q}")
-            continue
+            return None
+
+    valid_questions: List[str] = []
+    if candidates:
+        with ThreadPoolExecutor(max_workers=min(len(candidates), 10)) as pool:
+            for q in pool.map(_validate_candidate, candidates):
+                if q:
+                    valid_questions.append(q)
+    valid_questions = valid_questions[:n]
 
     # ── Step 4: heuristic fill-in if not enough valid questions ───────────
     if len(valid_questions) < n:
         heuristics = _heuristic_example_questions(
-            numeric_cols, binary_cat_cols, cat_col_names, schema_profile
+            numeric_cols, binary_cat_cols, cat_col_names, multi_cat_cols, schema_profile
         )
         for hq in heuristics:
             if len(valid_questions) >= n:
@@ -1347,6 +1365,7 @@ def _heuristic_example_questions(
     numeric_cols: List[str],
     binary_cat_cols: List[str],
     cat_col_names: List[str],
+    multi_cat_cols: List[str],
     schema_profile: Dict[str, Any],
 ) -> List[str]:
     """
@@ -1393,6 +1412,16 @@ def _heuristic_example_questions(
     if len(cat_col_names) >= 3:
         questions.append(
             f"Are {cat_col_names[1]} and {cat_col_names[2]} independent of each other?"
+        )
+
+    # one_way_anova — categorical grouping (3+ groups) + numeric outcome
+    if multi_cat_cols and numeric_cols:
+        questions.append(
+            f"Does {numeric_cols[0]} differ significantly across the {multi_cat_cols[0]} groups?"
+        )
+    if len(multi_cat_cols) >= 1 and len(numeric_cols) >= 2:
+        questions.append(
+            f"Is there a significant difference in {numeric_cols[1]} between the different {multi_cat_cols[0]} groups?"
         )
 
     return questions

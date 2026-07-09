@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import traceback
 
@@ -45,7 +46,7 @@ async def analyze(request: StatTestRequest):
 
     try:
         df = session["df"]
-        result = run_statistical_analysis(df, request.question)
+        result = await asyncio.to_thread(run_statistical_analysis, df, request.question)
         return StatTestResult(**result)
 
     except Exception as e:
@@ -82,7 +83,7 @@ async def get_example_questions(request: ExamplesRequest):
 
     try:
         df = session["df"]
-        questions = generate_valid_example_questions(df, n=request.n)
+        questions = await asyncio.to_thread(generate_valid_example_questions, df, n=request.n)
         return ExamplesResponse(
             questions=questions,
             message=f"Generated {len(questions)} example questions.",

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import traceback
 from io import BytesIO
@@ -48,7 +49,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         ids = [c["id"] for c in chunks]
         metadatas = [{"text": t, "source": file.filename} for t in texts]
 
-        vectors = embedder.embed_texts(texts)
+        vectors = await asyncio.to_thread(embedder.embed_texts, texts)
 
         if _vector_store is None:
             raise RuntimeError("Vector store not initialised")

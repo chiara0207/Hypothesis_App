@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import traceback
 from fastapi import APIRouter, HTTPException
@@ -23,7 +24,7 @@ async def ask_question(request: AskRequest):
     try:
         if _engine is None:
             raise RuntimeError("QA engine not initialised")
-        resp = _engine.answer(request.question, top_k=request.top_k)
+        resp = await asyncio.to_thread(_engine.answer, request.question, top_k=request.top_k)
         return AnswerResponse(answer=resp["answer"], sources=resp["sources"])
     except Exception as e:
         logger.error(f"ASK failed: {e}\n{traceback.format_exc()}")

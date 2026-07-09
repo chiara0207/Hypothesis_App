@@ -98,13 +98,13 @@ def _chart_entry(key: str, title: str, fig: go.Figure, interpretation: str) -> D
     }
 
 
-def _base_layout(fig: go.Figure, height: int = 380) -> None:
+def _base_layout(fig: go.Figure, height: int = 420) -> None:
     fig.update_layout(
         height=height,
-        margin=dict(l=40, r=20, t=50, b=30),
+        margin=dict(l=50, r=20, t=20, b=70),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        legend=dict(orientation="h", yanchor="top", y=-0.18, xanchor="center", x=0.5),
     )
 
 
@@ -179,7 +179,7 @@ def build_boxplot(df: pd.DataFrame, group_col: str, value_col: str) -> go.Figure
             y=vals, name=str(g), boxmean=True,
             marker_color=PALETTE[i % len(PALETTE)],
         ))
-    fig.update_layout(title=f"{value_col} by {group_col}", yaxis_title=value_col)
+    fig.update_layout(yaxis_title=value_col)
     _base_layout(fig)
     return fig
 
@@ -191,7 +191,7 @@ def build_violin_plot(df: pd.DataFrame, group_col: str, value_col: str) -> go.Fi
             y=vals, name=str(g), box_visible=True, meanline_visible=True, points="outliers",
             line_color=PALETTE[i % len(PALETTE)],
         ))
-    fig.update_layout(title=f"{value_col} distribution shape by {group_col}", yaxis_title=value_col)
+    fig.update_layout(yaxis_title=value_col)
     _base_layout(fig)
     return fig
 
@@ -242,7 +242,6 @@ def build_bell_curves(df: pd.DataFrame, group_col: str, value_col: str) -> go.Fi
         fig.add_vline(x=mu, line=dict(color=color, dash="dash", width=1))
 
     fig.update_layout(
-        title=f"Normal (bell curve) approximation of {value_col} by {group_col}",
         xaxis_title=value_col, yaxis_title="Probability density",
     )
     _base_layout(fig)
@@ -277,11 +276,10 @@ def build_histogram(df: pd.DataFrame, value_col: str, group_col: Optional[str] =
             fig.add_trace(go.Histogram(
                 x=vals, name=str(g), opacity=0.6, marker_color=PALETTE[i % len(PALETTE)],
             ))
-        fig.update_layout(barmode="overlay", title=f"Distribution of {value_col} by {group_col}")
+        fig.update_layout(barmode="overlay")
     else:
         vals = pd.to_numeric(df[value_col], errors="coerce").dropna()
         fig.add_trace(go.Histogram(x=vals, marker_color=PALETTE[0], name=value_col))
-        fig.update_layout(title=f"Distribution of {value_col}")
     fig.update_layout(xaxis_title=value_col, yaxis_title="Count")
     _base_layout(fig)
     return fig
@@ -320,7 +318,7 @@ def build_scatterplot(df: pd.DataFrame, x_col: str, y_col: str) -> go.Figure:
             x=x_line, y=slope * x_line + intercept, mode="lines", name="Trend line",
             line=dict(color=PALETTE[2], width=2, dash="dash"),
         ))
-    fig.update_layout(title=f"{y_col} vs {x_col}", xaxis_title=x_col, yaxis_title=y_col)
+    fig.update_layout(xaxis_title=x_col, yaxis_title=y_col)
     _base_layout(fig)
     return fig
 
@@ -353,8 +351,7 @@ def build_correlation_matrix(df: pd.DataFrame, max_cols: int = 15) -> Optional[g
         zmin=-1, zmax=1, colorscale="RdBu", reversescale=True,
         text=corr.values, texttemplate="%{text}", colorbar=dict(title="r"),
     ))
-    fig.update_layout(title="Correlation matrix (all numeric columns)")
-    _base_layout(fig, height=max(380, 40 * len(corr.columns)))
+    _base_layout(fig, height=max(420, 40 * len(corr.columns)))
     return fig
 
 
@@ -381,7 +378,7 @@ def build_contingency_heatmap(df: pd.DataFrame, x_col: str, y_col: str) -> go.Fi
         z=ct.values, x=[str(c) for c in ct.columns], y=[str(i) for i in ct.index],
         colorscale="Blues", text=ct.values, texttemplate="%{text}", colorbar=dict(title="Count"),
     ))
-    fig.update_layout(title=f"{x_col} vs {y_col} (observed counts)", xaxis_title=y_col, yaxis_title=x_col)
+    fig.update_layout(xaxis_title=y_col, yaxis_title=x_col)
     _base_layout(fig)
     return fig
 

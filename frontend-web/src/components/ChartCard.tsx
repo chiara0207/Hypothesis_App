@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import PlotlyChart, { type PlotlyFigure } from "@/components/PlotlyChart";
+import { useRef, useState } from "react";
+import PlotlyChart, { type PlotlyFigure, type PlotlyChartHandle } from "@/components/PlotlyChart";
 import { apiPost, ApiError } from "@/lib/api";
 
 export type VizChart = {
@@ -32,6 +32,12 @@ export default function ChartCard({
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
   const [asking, setAsking] = useState(false);
+  const chartRef = useRef<PlotlyChartHandle>(null);
+
+  function downloadChart() {
+    const filename = chart.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "chart";
+    chartRef.current?.downloadPng(filename);
+  }
 
   async function ask() {
     const q = question.trim();
@@ -62,8 +68,17 @@ export default function ChartCard({
 
   return (
     <div className="rounded-xl border border-border bg-bg-card p-4">
-      <p className="mb-2 text-sm font-semibold text-text-primary">{chart.title}</p>
-      <PlotlyChart figure={chart.figure} />
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-text-primary">{chart.title}</p>
+        <button
+          onClick={downloadChart}
+          title="Download this chart as a PNG image"
+          className="shrink-0 rounded-md border border-border-strong px-2.5 py-1 text-xs text-text-secondary hover:bg-bg-card-alt hover:text-text-primary"
+        >
+          ⬇ Save image
+        </button>
+      </div>
+      <PlotlyChart ref={chartRef} figure={chart.figure} />
       {chart.interpretation && (
         <p className="mt-2 text-[0.85rem] text-text-secondary">{chart.interpretation}</p>
       )}

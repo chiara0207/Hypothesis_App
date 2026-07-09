@@ -13,6 +13,7 @@ export default function StatisticalAnalysisPage() {
   const [alpha, setAlpha] = useState(0.05);
   const [question, setQuestion] = useState("");
   const [examples, setExamples] = useState<string[] | null>(null);
+  const [examplesLoading, setExamplesLoading] = useState(false);
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState("");
   const [charts, setCharts] = useState<VizChart[] | null>(null);
@@ -22,9 +23,12 @@ export default function StatisticalAnalysisPage() {
   // so there's no need to reset it back to null when the session clears.
   useEffect(() => {
     if (!csvSessionId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setExamplesLoading(true);
     apiPost<{ questions: string[] }>("/stats/examples", { session_id: csvSessionId, n: 6 })
       .then((res) => setExamples(res.questions))
-      .catch(() => setExamples([]));
+      .catch(() => setExamples([]))
+      .finally(() => setExamplesLoading(false));
   }, [csvSessionId]);
 
   // charts are only ever rendered inside ResultView's success branch, which
@@ -71,14 +75,34 @@ export default function StatisticalAnalysisPage() {
   }
 
   function exportHistoryCsv() {
-    const headers = ["Question", "Test", "p-value", "Test Statistic", "Alpha", "Significant", "Interpretation", "Plain Explanation", "Rationale"];
+    const headers = [
+      "Question",
+      "Test",
+      "Variables",
+      "p-value",
+      "Test Statistic",
+      "Alpha",
+      "Significant",
+      "Detailed Statistics",
+      "Assumption Checks",
+      "Interpretation",
+      "Plain Explanation",
+      "Rationale",
+    ];
     const rows = statsHistory.map((h) => [
       h.question,
       h.result.test_display_name,
+      Object.entries(h.result.variables_used)
+        .map(([role, col]) => `${role}=${col}`)
+        .join("; "),
       h.result.p_value ?? "",
       h.result.statistic ?? "",
       h.result.alpha,
       h.result.significant ?? "",
+      Object.keys(h.result.additional_stats ?? {}).length > 0 ? JSON.stringify(h.result.additional_stats) : "",
+      h.result.assumption_checks.length > 0
+        ? h.result.assumption_checks.map((c) => `${c.name}: ${c.passed ? "passed" : "failed"} (${c.detail})`).join("; ")
+        : "",
       h.result.interpretation,
       h.result.plain_explanation,
       h.result.rationale,
@@ -91,7 +115,9 @@ export default function StatisticalAnalysisPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = "analysis_results.csv";
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
@@ -119,7 +145,12 @@ export default function StatisticalAnalysisPage() {
       ) : (
         <>
           <div className="mb-6 rounded-xl border border-border bg-bg-card p-5">
-            {examples && examples.length > 0 && (
+            {examplesLoading && (
+              <p className="mb-4 text-xs font-bold tracking-wider text-text-muted uppercase">
+                Generating example questions for your dataset…
+              </p>
+            )}
+            {!examplesLoading && examples && examples.length > 0 && (
               <details className="mb-4">
                 <summary className="cursor-pointer text-xs font-bold tracking-wider text-text-muted uppercase">
                   Suggested questions

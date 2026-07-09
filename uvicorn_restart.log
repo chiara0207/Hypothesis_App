@@ -1,0 +1,136 @@
+2026-07-09 00:16:18,910 - app_backend.main - INFO - App created and routes registered
+INFO:     Started server process [1753]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:49807 - "GET /docs HTTP/1.1" 200 OK
+2026-07-09 00:16:24,382 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='What is a p-value?'
+2026-07-09 00:16:27,560 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49809 - "POST /handbook/ask HTTP/1.1" 200 OK
+2026-07-09 00:16:33,977 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=None, question='Explain a t-test in detail with examples.'
+INFO:     127.0.0.1:49819 - "GET /docs HTTP/1.1" 200 OK
+2026-07-09 00:16:37,355 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49816 - "POST /handbook/ask HTTP/1.1" 200 OK
+2026-07-09 00:17:15,584 - app_backend.routers.upload - INFO - CSV upload: sample_visualization_test.csv
+2026-07-09 00:17:15,591 - app_backend.utils.session_store - INFO - Session created: 3f246ffc-a987-47ab-ae4d-6395bebbf15b (sample_visualization_test.csv, 120 rows)
+INFO:     127.0.0.1:49852 - "POST /upload/csv HTTP/1.1" 200 OK
+2026-07-09 00:20:20,519 - app_backend.routers.upload - INFO - CSV upload: sample_visualization_test.csv
+2026-07-09 00:20:20,521 - app_backend.utils.session_store - INFO - Session created: 844484b4-5904-4edb-a6cf-cf1b9196d42d (sample_visualization_test.csv, 120 rows)
+INFO:     127.0.0.1:49996 - "POST /upload/csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "OPTIONS /stats/examples HTTP/1.1" 200 OK
+2026-07-09 00:20:20,540 - app_backend.routers.stats - INFO - EXAMPLES: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, n=6
+2026-07-09 00:20:23,943 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,337 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,338 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,476 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,499 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,606 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,745 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,754 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,817 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,909 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,964 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:25,966 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: You asked about the relationship between device type and purchased status, which involves two categorical variables. How
+INFO:     127.0.0.1:49996 - "POST /stats/examples HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "OPTIONS /handbook/concepts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50013 - "OPTIONS /handbook/concepts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49996 - "GET /handbook/concepts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50013 - "GET /handbook/concepts HTTP/1.1" 200 OK
+2026-07-09 00:20:33,701 - app_backend.routers.stats - INFO - EXAMPLES: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, n=6
+2026-07-09 00:20:33,703 - app_backend.routers.stats - INFO - EXAMPLES: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, n=6
+2026-07-09 00:20:35,883 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:36,293 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,206 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,378 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,382 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,391 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,478 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,567 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,639 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,728 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,782 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,824 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,828 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,875 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,884 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,930 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:37,934 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user asked about the relationship between the device used and the group classification, which involves two categoric
+INFO:     127.0.0.1:50018 - "POST /stats/examples HTTP/1.1" 200 OK
+2026-07-09 00:20:37,977 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:38,011 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:38,022 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:38,172 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:38,175 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: You asked about the association between purchased status and device type, which involves two categorical variables. Howe
+2026-07-09 00:20:38,366 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:38,854 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:20:38,857 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user is asking about a significant difference in scores based on hours studied, which implies a relationship between
+INFO:     127.0.0.1:50017 - "POST /stats/examples HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50076 - "OPTIONS /stats/analyze HTTP/1.1" 200 OK
+2026-07-09 00:21:31,749 - app_backend.routers.stats - INFO - STATS: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, question='Is there a correlation between score and hours_studied?'
+2026-07-09 00:21:31,758 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-09 00:21:33,637 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:21:33,647 - app_backend.services.stats_service - INFO - LLM selected test: pearson_correlation, variables: {'x': 'hours_studied', 'y': 'score', 'group': None}
+2026-07-09 00:21:33,647 - app_backend.services.stats_service - INFO - After normalization: pearson_correlation, variables: {'x': 'hours_studied', 'y': 'score'}
+2026-07-09 00:21:33,648 - app_backend.services.stats_service - INFO - Running pearson_correlation...
+2026-07-09 00:21:33,661 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-09 00:21:35,688 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50076 - "POST /stats/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50076 - "OPTIONS /visualization/suite HTTP/1.1" 200 OK
+2026-07-09 00:21:35,709 - app_backend.routers.visualization - INFO - VISUALIZATION: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, test=pearson_correlation, p_value=0.7683834385630698, alpha=0.05
+INFO:     127.0.0.1:50076 - "POST /visualization/suite HTTP/1.1" 200 OK
+2026-07-09 00:21:41,808 - app_backend.routers.stats - INFO - STATS: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, question='Is there an association between the device used and whether a purchase was made?'
+2026-07-09 00:21:41,820 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-09 00:21:43,441 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:21:43,443 - app_backend.services.stats_service - INFO - LLM selected test: chi_square, variables: {'x': 'device', 'y': 'purchased', 'group': None}
+2026-07-09 00:21:43,444 - app_backend.services.stats_service - INFO - After normalization: chi_square, variables: {'x': 'device', 'y': 'purchased'}
+2026-07-09 00:21:43,444 - app_backend.services.stats_service - INFO - Running chi_square...
+2026-07-09 00:21:43,463 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-09 00:21:45,518 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50085 - "POST /stats/analyze HTTP/1.1" 200 OK
+2026-07-09 00:21:45,538 - app_backend.routers.visualization - INFO - VISUALIZATION: session=844484b4-5904-4edb-a6cf-cf1b9196d42d, test=chi_square, p_value=0.005594347120230847, alpha=0.05
+INFO:     127.0.0.1:50085 - "POST /visualization/suite HTTP/1.1" 200 OK
+2026-07-09 00:22:17,162 - app_backend.routers.upload - INFO - CSV upload: sample_anova_teaching.csv
+2026-07-09 00:22:17,164 - app_backend.utils.session_store - INFO - Session created: dacb25ff-4e81-422b-918d-db8b1b2a3a6f (sample_anova_teaching.csv, 100 rows)
+INFO:     127.0.0.1:50102 - "POST /upload/csv HTTP/1.1" 200 OK
+2026-07-09 00:22:17,174 - app_backend.routers.stats - INFO - EXAMPLES: session=dacb25ff-4e81-422b-918d-db8b1b2a3a6f, n=6
+2026-07-09 00:22:17,176 - app_backend.routers.visualization - INFO - VISUALIZATION: session=dacb25ff-4e81-422b-918d-db8b1b2a3a6f, test=chi_square, p_value=0.005594347120230847, alpha=0.05
+INFO:     127.0.0.1:50103 - "POST /visualization/suite HTTP/1.1" 200 OK
+2026-07-09 00:22:19,931 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,461 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,511 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,546 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,574 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,593 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,870 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,902 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:21,986 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:22,230 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:22,235 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: You asked about the association between teaching method (categorical) and exam score categories (pass/fail, categorical)
+2026-07-09 00:22:22,485 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:22,488 - app_backend.services.stats_service - INFO - LLM marked question as unsupported: The user asked about the relationship between the teaching method (categorical) and the number of students achieving sco
+INFO:     127.0.0.1:50102 - "POST /stats/examples HTTP/1.1" 200 OK
+2026-07-09 00:22:39,299 - app_backend.routers.stats - INFO - STATS: session=dacb25ff-4e81-422b-918d-db8b1b2a3a6f, question='Do students taught by Traditional, Online, Hybrid, and Flipped teaching methods '
+2026-07-09 00:22:39,303 - app_backend.services.stats_service - INFO - Calling LLM for test selection...
+2026-07-09 00:22:43,990 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 00:22:43,992 - app_backend.services.stats_service - INFO - LLM selected test: one_way_anova, variables: {'x': None, 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-09 00:22:43,993 - app_backend.services.stats_service - INFO - After normalization: one_way_anova, variables: {'x': 'teaching_method', 'y': 'exam_score', 'group': 'teaching_method'}
+2026-07-09 00:22:43,993 - app_backend.services.stats_service - INFO - Running one_way_anova...
+2026-07-09 00:22:44,001 - app_backend.services.stats_service - INFO - Calling LLM for explanation...
+2026-07-09 00:22:46,241 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50125 - "POST /stats/analyze HTTP/1.1" 200 OK
+2026-07-09 00:22:46,260 - app_backend.routers.visualization - INFO - VISUALIZATION: session=dacb25ff-4e81-422b-918d-db8b1b2a3a6f, test=one_way_anova, p_value=2.1285709063679083e-08, alpha=0.05
+INFO:     127.0.0.1:50125 - "POST /visualization/suite HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50167 - "GET /handbook/concepts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50168 - "GET /handbook/concepts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50174 - "OPTIONS /handbook/ask HTTP/1.1" 200 OK
+2026-07-09 00:24:23,433 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=one_way_anova, question='Is there also a two-way ANOVA?'
+2026-07-09 00:24:25,757 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50174 - "POST /handbook/ask HTTP/1.1" 200 OK
+2026-07-09 00:24:34,625 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=one_way_anova, question='what does ANOVA mean?'
+2026-07-09 00:24:36,633 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50183 - "POST /handbook/ask HTTP/1.1" 200 OK
+2026-07-09 00:24:46,843 - app_backend.routers.handbook - INFO - HANDBOOK ASK: test=one_way_anova, question='What is variance and covariance?'
+2026-07-09 00:24:50,970 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50190 - "POST /handbook/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50233 - "GET /handbook/concepts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50272 - "GET /handbook/concepts HTTP/1.1" 200 OK
