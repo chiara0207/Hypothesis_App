@@ -1,5 +1,6 @@
 {
   "framework": "nextjs",
+  "trailingSlash": true,
   "rewrites": [
     {
       "source": "/(.*)",
